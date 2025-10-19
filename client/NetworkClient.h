@@ -25,7 +25,7 @@
 #endif
 
 
-class Mediator; // forward declaration
+class UserStatus; // forward declaration
 
 class NetworkClient {
 private:
@@ -33,7 +33,7 @@ private:
     std::string server_ip;      // IP-адрес сервера для подключения
     int port;                   // Порт сервера для подключения
 
-    std::shared_ptr<Mediator> mediator; // Умный указатель на Mediator
+    std::shared_ptr<UserStatus> status; // Умный указатель на UserStatus
     std::thread recvThread;     // Поток для приёма сообщений
     std::thread sendThread;     // Поток для отправки сообщений
     std::atomic<bool> threadsRunning{false};
@@ -42,8 +42,8 @@ private:
     std::string recv_buffer_; // Буфер для накопления данных при приёме
 
 public:
-    // Конструктор: принимает shared_ptr<Mediator>
-    NetworkClient(const std::string& ip, int port, std::shared_ptr<Mediator> mediator);
+    // Конструктор: принимает shared_ptr<UserStatus>
+    NetworkClient(const std::string& ip, int port, std::shared_ptr<UserStatus> status);
     ~NetworkClient();
 
     // Метод подключения к серверу

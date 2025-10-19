@@ -11,12 +11,12 @@
 #include <arpa/inet.h>          // преобразовать ip inet_pton()
 #include <sys/select.h>         // для select()
 #include "NetworkClient.h"
-#include "Mediator.h"
+#include "UserStatus.h"
 
 
-// Конструктор: принимает shared_ptr<Mediator>
-NetworkClient::NetworkClient(const std::string& ip, int port, std::shared_ptr<Mediator> mediator)
-    : server_ip(ip), port(port), sock(-1), mediator(std::move(mediator)) {}  // -1 = сокет не инициализирован
+// Конструктор: принимает shared_ptr<UserStatus>
+NetworkClient::NetworkClient(const std::string& ip, int port, std::shared_ptr<UserStatus> status)
+    : server_ip(ip), port(port), sock(-1), status(std::move(status)) {}  // -1 = сокет не инициализирован
 
         
 NetworkClient::~NetworkClient() {
@@ -32,7 +32,7 @@ void NetworkClient::startThreads() {
     threadsRunning.store(true);
     recvThread = std::thread(&NetworkClient::recvLoop, this);
     sendThread = std::thread(&NetworkClient::sendLoop, this);
-    mediator->setNetworckThreadsSost(true);
+    status->setNetworckThreadsSost(true);
 }
 
 // Остановка потоков приёма и отправки
@@ -41,12 +41,12 @@ void NetworkClient::stopThreads() {
     threadsRunning.store(false);
     if (recvThread.joinable()) recvThread.join();
     if (sendThread.joinable()) sendThread.join();
-    mediator->setNetworckThreadsSost(false);
+    status->setNetworckThreadsSost(false);
 }
 
 // Функция для потока приёма
 void NetworkClient::recvLoop() {
-    while (threadsRunning.load() && mediator && mediator->running() && mediator->getNetworckConnect()) {
+    while (threadsRunning.load() && status && status->running() && status->getNetworckConnect()) {
         fd_set readfds;
         FD_ZERO(&readfds);
         FD_SET(sock, &readfds);
@@ -67,7 +67,7 @@ void NetworkClient::recvLoop() {
                     // std::this_thread::sleep_for(std::chrono::seconds(3));
                     // ПЕРЕПРОВЕРКА подключания и заного подключится 
                     // пока просто выход
-                    mediator->setNetworckConnect(false);
+                    status->setNetworckConnect(false);
                     break;
                 }
                 
@@ -75,7 +75,7 @@ void NetworkClient::recvLoop() {
                 // НУЖНО ДОБАВИТЬ ОСТАНОВКУ И ПЕРЕПРОВЕРКУ В ЦИКЛЕ 
                 
                 if (!msg.empty()) {
-                    mediator->pushAcceptedMessage(msg);
+                    status->pushAcceptedMessage(msg);
                 }
             } catch (const std::exception& e) {
                 std::cerr << "Ошибка приёма: " << e.what() << std::endl;
@@ -94,8 +94,8 @@ void NetworkClient::recvLoop() {
 
 // Функция для потока отправки
 void NetworkClient::sendLoop() {
-    while (threadsRunning.load() && mediator && mediator->running() && mediator->getNetworckConnect()) {
-        std::string msg = mediator->waitAndPopMessageToSend();
+    while (threadsRunning.load() && status && status->running() && status->getNetworckConnect()) {
+        std::string msg = status->waitAndPopMessageToSend();
         if (!msg.empty()) {
             try {
                 sendMess(msg);
@@ -114,7 +114,7 @@ void NetworkClient::connecting() {
     // AF_INET = IPv4, SOCK_STREAM = TCP, 0 = протокол по умолчанию
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
-        mediator->setNetworckConnect(false);
+        status->setNetworckConnect(false);
         err = true;
         std::cerr << "Не удалось создать сокет\n";
         throw std::runtime_error("Не удалось создать сокет");
@@ -133,7 +133,7 @@ void NetworkClient::connecting() {
         close(sock);  // Закрываем сокет при ошибке
         //throw std::runtime_error("Некорректный адрес сервера");
         std::cerr << "Некорректный адрес сервера\n";
-        mediator->setNetworckConnect(false);
+        status->setNetworckConnect(false);
         err = true;
     }
 
@@ -145,13 +145,13 @@ void NetworkClient::connecting() {
         close(sock);
         // throw std::runtime_error("Ошибка подключения");
         std::cerr << "Ошибка подключения\n";
-        mediator->setNetworckConnect(false);
+        status->setNetworckConnect(false);
         err = true;
     }
 
     if (!err)
     {
-        mediator->setNetworckConnect(true);
+        status->setNetworckConnect(true);
     }
     
 }
@@ -164,7 +164,7 @@ void NetworkClient::sendMess(const std::string& message) {
     // 0 - флаги (по умолчанию)
     if (send(sock, message.c_str(), message.size(), 0) < 0) {
         std::cerr << "Ошибка отправки\n";
-        mediator->setNetworckConnect(false);
+        status->setNetworckConnect(false);
         // throw std::runtime_error("Ошибка отправки");
     }
 }
@@ -181,7 +181,7 @@ void NetworkClient::sendMess(const std::string& message) {
         
 //     if (bytes_read == 0) {
 //         std::cerr << "getMess | Сервер закрыл соединение\n";
-// 		mediator->setNetworckConnect(false);
+// 		status->setNetworckConnect(false);
 //         return "";  // Возвращаем пустую строку
 //         // throw std::runtime_error("Сервер закрыл соединение");
 //         // если соединение оборвано,, то getMess будет постоянно отдавать ""
@@ -246,7 +246,7 @@ std::string NetworkClient::getMess() {
     }
 
     // 2) читаем из сокета пока не соберём полный JSON либо не произойдёт ошибка/закрытие
-    while (threadsRunning.load() && mediator && mediator->running() && mediator->getNetworckConnect()) {
+    while (threadsRunning.load() && status && status->running() && status->getNetworckConnect()) {
         ssize_t n = ::recv(sock, tmp, sizeof(tmp), 0);      // читаем из сокета
         if (n > 0) {                                        // получили n байт
             recv_buffer_.append(tmp, static_cast<size_t>(n));
@@ -254,7 +254,7 @@ std::string NetworkClient::getMess() {
             const size_t MAX_ALLOWED = 32 * 1024 * 1024;    // 32 MB
             if (recv_buffer_.size() > MAX_ALLOWED) {        // защитный лимит
                 std::cerr << "Получено слишком большое сообщение: " << recv_buffer_.size() << " байт\n";
-                mediator->setNetworckConnect(false);
+                status->setNetworckConnect(false);
                 throw std::runtime_error("Сообщение превышает допустимый размер");
             }
 
@@ -270,7 +270,7 @@ std::string NetworkClient::getMess() {
             continue;
         } else if (n == 0) {
             std::cerr << "getMess | Сервер закрыл соединение\n";
-            mediator->setNetworckConnect(false);
+            status->setNetworckConnect(false);
             return "";
         } else { // n < 0
             if (errno == EINTR) {
@@ -280,7 +280,7 @@ std::string NetworkClient::getMess() {
                 continue;
             } else {
                 std::cerr << "recv error: " << strerror(errno) << "\n";
-                mediator->setNetworckConnect(false);
+                status->setNetworckConnect(false);
                 throw std::runtime_error("Ошибка чтения сокета");
             }
         }
