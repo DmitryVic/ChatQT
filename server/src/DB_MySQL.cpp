@@ -400,8 +400,8 @@ bool DataBaseMySQL::write_Chat_P(std::shared_ptr<User> user_sender, std::shared_
 }
 
 
-// Загрузить историю приватного чата: пары <login, сообщение>
-bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_ptr<User> user_recipient, std::vector<std::pair<std::string, std::string>>& out) {
+// Загрузить историю приватного чата
+bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_ptr<User> user_recipient, std::vector<MessageStruct>& out) {
 
     // Очистка предыдущих результатов
     while (mysql_next_result(&sql_mysql) == 0) {
@@ -411,7 +411,7 @@ bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_p
     sql_res = nullptr;
 
     std::string request_mysql = 
-    "SELECT uss.login, m.text "
+    "SELECT uss.login, uss.name, m.text, uss.name" ///////////////////////////////////////////////////////////// ДОРАБОТАТЬ ЗАПРОСЫ ПОД std::vector<MessageStruct>
     "FROM messages m "
     "JOIN users uss ON uss.id = m.sender_id "
     "WHERE m.chat_id IN (WITH id2 AS (SELECT uc.chat_id, COUNT(uc.chat_id ) AS c2 "
@@ -481,8 +481,8 @@ bool DataBaseMySQL::write_Chat_H(std::shared_ptr<User> user_sender, const std::s
 }
 
 
-// Загрузить историю общего чата:  <login, name, сообщение>
-bool DataBaseMySQL::load_Chat_H(std::vector<std::vector<std::string>>& out) {
+// Загрузить историю общего чата
+bool DataBaseMySQL::load_Chat_H(std::vector<MessageStruct>& out) {
 
     std::string request_mysql = 
     "SELECT u.login, u.name, m.text "

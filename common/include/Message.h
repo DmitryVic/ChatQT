@@ -4,9 +4,84 @@
 #include <variant>
 #include <memory>
 #include <utility>
-
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <ctime>
 
 using json = nlohmann::json;
+
+
+/*=====================================
+        Обработка времени
+=====================================*/
+// Тип для хранения даты и времени
+using Timestamp = std::chrono::system_clock::time_point;
+// Функция для получения текущего времени
+Timestamp getCurrentTimestamp();
+// Конвертация из Timestamp в строку (MySQL формат)
+std::string timestampToString(const Timestamp& ts);
+// Конвертация из строки в Timestamp
+Timestamp stringToTimestamp(const std::string& str);
+
+
+/*=====================================
+        Собственные типы данных
+=====================================*/
+
+
+//стрруктура сообщения
+struct MessageStruct
+{
+    Timestamp time;
+    std::string mess;
+    std::string userName;
+    std::string userLogin;
+    
+    // Метод для сериализации в JSON
+    void to_json(json& j) const {
+        j = {
+            {"time", std::chrono::system_clock::to_time_t(time)},
+            {"mess", mess},
+            {"userName", userName},
+            {"userLogin", userLogin}
+        };
+    }
+
+    // Метод для десериализации из JSON
+    void from_json(const json& j) {
+        time = std::chrono::system_clock::from_time_t(j.at("time").get<std::time_t>());
+        mess = j.at("mess").get<std::string>();
+        userName = j.at("userName").get<std::string>();
+        userLogin = j.at("userLogin").get<std::string>();
+    }
+};
+
+// Регистрация типов для работы с JSON
+namespace nlohmann {
+    template<>
+    struct adl_serializer<MessageStruct> {
+        static void to_json(json& j, const MessageStruct& r) {
+            r.to_json(j);
+        }
+
+        static void from_json(const json& j, MessageStruct& r) {
+            r.from_json(j);
+        }
+    };
+
+    template<>
+    struct adl_serializer<Timestamp> {
+        static void to_json(json& j, const Timestamp& ts) {
+            j = timestampToString(ts);
+        }
+
+        static void from_json(const json& j, Timestamp& ts) {
+            ts = stringToTimestamp(j.get<std::string>());
+        }
+    };
+}
+
 
 // Абстрактный базовый класс
 class Message {
@@ -159,7 +234,7 @@ public:
 =====================================*/
 
 
-// Ответ сервера на запрос true or false
+// false - ошибка сервера
 class Message50 : public Message {
 public:
     bool status_request;
@@ -177,7 +252,7 @@ public:
 // Передача данных общего чата
 class Message51 : public Message {
 public:
-    std::vector<std::vector<std::string>> history_chat_H;
+    std::vector<MessageStruct> history_chat_H;
     
     int getTupe() const override { return 51; }
     
@@ -190,7 +265,7 @@ public:
 // Передача данных приватного чата
 class Message52 : public Message {
 public:
-    std::vector<std::pair<std::string, std::string>> history_chat_P;
+    std::vector<MessageStruct> history_chat_P;
     std::pair<std::string, std::string> login_name_friend;
     std::pair<std::string, std::string> login_name_MY;
     
@@ -215,7 +290,7 @@ public:
 };
 
 
-// получить список всех юзеров в чате кому написать
+// получить список всех юзеров чата
 class Message54 : public Message {
 public:
     std::vector<std::pair<std::string, std::string>> list_Users;
@@ -241,10 +316,12 @@ public:
 };
 
 
-// Ответ сервера вернуть имя
+// Ответ сервера Вы залогинены
 class Message56 : public Message {
 public:
+    bool authorization;
     std::string my_name;
+    std::string my_login;
     
     int getTupe() const override { return 56; }
     

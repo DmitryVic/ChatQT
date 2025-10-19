@@ -4,88 +4,263 @@
 #include "MessageHandler.h"
 #include <memory>
 #include "Message.h"
+#include <atomic>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+#include <iostream>
+
+
+UserStatus::UserStatus() : myUser{"", "", ""} {}
 
 
 
-UserStatus::UserStatus() : myUser("", "", ""){}
+//##################################################
+// Обновление UI
+//##################################################
 
+// регистрация уведомителя (должна вызываться из GUI при инициализации)
+void UserStatus::setUiNotifyCallback(std::function<void()> cb) {
+    // thread-safe assignment (std::function присваивается атомарно только если никто не вызывает одновременно,
+    // обычное присваивание — регистрация делается в инициализации GUI)
+    _notifyCallback = std::move(cb);
+}
 
+// Сброс флага обновления - главный поток вызывает после обработки уведомления
+void UserStatus::clearUiUpdatePending() {
+    _uiUpdatePending.store(false, std::memory_order_release);
+}
 
-void UserStatus::setMenuChat(MENU_CHAT menu_chat){
-    this->menu_chat = menu_chat;
+// Уведомить UI о необходимости обновления (вызывается из рабочих потоков)
+void UserStatus::resetUI() {
+    // помечаем, что UI нужно обновить и - единожды - вызываем callback
+    if (_notifyCallback) {
+        bool expected = false;
+        if (_uiUpdatePending.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
+            // только если ранее не было "pending" — вызываем уведомление
+            try {
+                _notifyCallback(); // callback от UI
+            } catch(...) { /* _______ */ }
+        }
+    }
+}   
+
+//##################################################
+// Системные 
+//##################################################
+
+// Проверка состояния приложения
+bool UserStatus::running() const { return this->_isRunning.load(); }
+
+// Остановка приложения
+void UserStatus::stopApp() { this->_isRunning.store(false); }
+
+//##################################################
+// Очереди сообщений Сервер - Клиент
+//##################################################
+
+// Методы для работы с очередью принятых сообщений
+void UserStatus::pushAcceptedMessage(const std::string& msg) {
+    {
+        std::lock_guard<std::mutex> lock(acceptQueueMutex);
+        messageQueueAccept.push(msg);
+    }
+    acceptQqueueCondVar.notify_one();
+}
+
+std::string UserStatus::popAcceptedMessage() {
+    std::lock_guard<std::mutex> lock(acceptQueueMutex);
+    if (messageQueueAccept.empty()) {
+        return "";
+    }
+    std::string msg = messageQueueAccept.front();
+    messageQueueAccept.pop();
+    return msg;
+}
+bool UserStatus::hasAcceptedMessages() const {
+    std::lock_guard<std::mutex> lock(acceptQueueMutex);
+    return !messageQueueAccept.empty();
+}
+
+  // Ожидание и получение сообщения
+std::string UserStatus::waitAndPopAcceptedMessage() {
+    std::unique_lock<std::mutex> lock(acceptQueueMutex);
+    while (_isRunning.load() && this->getNetworckConnect()) {
+        if (!messageQueueAccept.empty()) {
+            std::string msg = messageQueueAccept.front();
+            messageQueueAccept.pop();
+            return msg;
+        }
+        acceptQqueueCondVar.wait_for(lock, std::chrono::milliseconds(500));
+    }
+    // Проверяем еще раз после выхода из цикла
+    if (!messageQueueAccept.empty()) {
+        std::string msg = messageQueueAccept.front();
+        messageQueueAccept.pop();
+        return msg;
+    }
+    return "";
+}
+
+// Методы для работы с очередью сообщений на отправку
+void UserStatus::pushMessageToSend(const std::string& msg) {
+    {
+        std::lock_guard<std::mutex> lock(sendQueueMutex);
+        messageQueueSend.push(msg);
+    }
+    sendQueueCondVar.notify_one();
+}
+
+std::string UserStatus::popMessageToSend() {
+    std::lock_guard<std::mutex> lock(sendQueueMutex);
+    if (messageQueueSend.empty()) {
+        return "";
+    }
+    std::string msg = messageQueueSend.front();
+    messageQueueSend.pop();
+    return msg;
+}
+
+bool UserStatus::hasMessagesToSend() const {
+    std::lock_guard<std::mutex> lock(sendQueueMutex);
+    return !messageQueueSend.empty();
+}
+
+std::string UserStatus::waitAndPopMessageToSend() {
+    std::unique_lock<std::mutex> lock(sendQueueMutex);
+    while (_isRunning.load() && this->getNetworckConnect()) {
+        if (!messageQueueSend.empty()) {
+            std::string msg = messageQueueSend.front();
+            messageQueueSend.pop();
+            return msg;
+        }
+        sendQueueCondVar.wait_for(lock, std::chrono::milliseconds(500));
+    }
+    // Проверяем еще раз после выхода из цикла
+    if (!messageQueueSend.empty()) {
+        std::string msg = messageQueueSend.front();
+        messageQueueSend.pop();
+        return msg;
+    }
+    return "";
+}
+
+//##################################################
+// флаги
+//##################################################
+
+//получить флаг наличия критических ошибок на сервере (true - ошибки)
+bool UserStatus::getSrvStatErrFatall() const{
+    return _srvStatErrFatall.load(std::memory_order_acquire);
+}
+
+//изменить статус флага наличия критических ошибок на сервере (true - ошибки)
+void UserStatus::setSrvStatErrFatall(bool SrvStatErrFatall){
+    _srvStatErrFatall.store(SrvStatErrFatall, std::memory_order_release);
+    this->resetUI();
+}
+
+//##################################################
+// СЕТЬ 
+//##################################################
+
+//получить флаг подкключчения к сети (true - подключены)
+bool UserStatus::getNetworckConnect() const{
+    return _networckConnect.load(std::memory_order_acquire);
+}
+
+//изменить статус флага подкключчения к сети (true - подключены)
+void UserStatus::setNetworckConnect(bool networckConnect){
+    _networckConnect.store(networckConnect, std::memory_order_release);
+    this->resetUI();
 }
 
 
-MENU_CHAT UserStatus::getMenuChat() const {
-    return this->menu_chat;
+//получить флаг запуска потоков сети - true - запущены
+bool UserStatus::getNetworckThreadsSost() const{
+    return _networckThreadsSost.load(std::memory_order_acquire);
+}
+
+//изменить статус флага запуска потоков сети - true - запущены
+void UserStatus::setNetworckThreadsSost(bool networckThreadsSost){
+    _networckThreadsSost.store(networckThreadsSost, std::memory_order_release);
+    this->resetUI();
 }
 
 
-void UserStatus::setMenuAuthoriz(MENU_AUTHORIZATION menu_authoriz){
-    this->menu_authoriz = menu_authoriz;
+
+//##################################################
+// СООБЩЕНИЯ
+//##################################################
+
+std::vector<MessageStruct> UserStatus::getMessList() const{
+    std::lock_guard<std::mutex> lock(_messListMutex);
+    return this->_messList;
+}
+
+void UserStatus::setMessList(std::vector<MessageStruct> messList){
+    std::lock_guard<std::mutex> lock(_messListMutex);
+    this->_messList = messList;
+}
+
+std::string UserStatus::getChatName() const{
+    std::lock_guard<std::mutex> lock(_chatNameMutex);
+    return this->_chatName;
+}
+
+void UserStatus::setChatName(std::string chatName){
+    std::lock_guard<std::mutex> lock(_chatNameMutex);
+    this->_chatName = chatName;
+}
+
+FriendData UserStatus::getFriendOpenChatP() const{
+    std::lock_guard<std::mutex> lock(_friendOpenChatPMutex);
+    return this->_friendOpenChatP;
+}
+
+void UserStatus::setFriendOpenChatP(FriendData friendD){
+    std::lock_guard<std::mutex> lock(_friendOpenChatPMutex);
+    this->_friendOpenChatP = friendD;
+}
+
+//##################################################
+// Уведомления
+//##################################################
+
+std::string UserStatus::getNotifi() const{
+    std::lock_guard<std::mutex> lock(notifiMutex);
+    return notifi;
+}
+
+void UserStatus::setNotifi(std::string notifi){
+    std::lock_guard<std::mutex> lock(notifiMutex);
+    this->notifi = notifi;
+    this->resetUI();
 }
 
 
-MENU_AUTHORIZATION UserStatus::getMenuAuthoriz() const{
-    return this->menu_authoriz;
-}
+//##################################################
+// Данные пользователя - АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ
+//##################################################
 
+    void UserStatus::setUser(User user){
+        std::lock_guard<std::mutex> lock(_myUserMutex);
+        this->myUser = user;
+    }
 
-void UserStatus::setLogin(std::string login){
-    this->myUser.setLogin(login);
-}
+    User UserStatus::getUser() const{
+        std::lock_guard<std::mutex> lock(_myUserMutex);
+        return this->myUser;
+    }
 
+     //получить флаг авторизации
+    bool UserStatus::getAuthorizationStatus() const{
+         return _authorizationStatus.load(std::memory_order_acquire);
+    }
 
-std::string UserStatus::getLogin() const{
-    return this->myUser.getLogin();
-}
-
-
-void UserStatus::setPass(std::string pass){
-    this->myUser.setPass(pass);
-}
-
-
-std::string UserStatus::getPass() const{
-    return this->myUser.getPass();
-}
-
-
-void UserStatus::setName(std::string Name){
-    this->myUser.setName(Name);
-}
-
-
-std::string UserStatus::getName() const{
-    return this->myUser.getName();
-}
-
-
-int UserStatus::getMessageType() const{
-    return this->typeMessage;
-}
-
-
-void UserStatus::setMessType(int type){
-    this->typeMessage = type;
-}
-
-
-std::shared_ptr<Message> UserStatus::getMessage() const{
-    return this->message;
-}
-
-
-void UserStatus::setMess(std::shared_ptr<Message> message){
-    this->message = message;
-}
-
-
-bool UserStatus::get_message_status() const{
-    return this->message_status;
-}
-
-// Сообщение существует?
-void UserStatus::set_message_status(bool message_status){
-    this->message_status = message_status;
-}
+    //изменить статус флага авторизация
+    void UserStatus::setAuthorizationStatus(bool authorizationStatus){
+        _authorizationStatus.store(authorizationStatus, std::memory_order_release);
+        this->resetUI();
+    }

@@ -33,14 +33,17 @@ bool HandlerMessage1::handle(const std::shared_ptr<Message>& message) {
     std::shared_ptr<User> user = currentUser.db->search_User(m1->login);
 
     bool authSuccess = user && (hashPassword(m1->pass) == user->getPass());
-    //Фиксация авторизации
-    if (authSuccess)
-        currentUser.online_user_login = user->getLogin();
     
-
+    
     // Формируем ответ
-    Message50 response;
-    response.status_request = authSuccess;
+    Message56 response;
+    response.authorization = authSuccess;
+    //Фиксация авторизации
+    if (authSuccess){
+        currentUser.online_user_login = user->getLogin();
+        response.my_login = currentUser.online_user_login;
+        response.my_name = user->getName();    
+    }
     
     // Отправляем ответ через сеть
     json j;
@@ -59,8 +62,8 @@ bool HandlerMessage2::handle(const std::shared_ptr<Message>& message) {
     auto m2 = std::dynamic_pointer_cast<Message2>(message);
     
     if (m2->name.empty() || m2->login.empty() || m2->pass.empty()) {
-        Message50 response;
-        response.status_request = false;
+        Message56 response;
+        response.authorization = false;
         json j;
         response.to_json(j);
         _network->sendMess(j.dump());
@@ -83,8 +86,10 @@ bool HandlerMessage2::handle(const std::shared_ptr<Message>& message) {
     //Фиксация авторизации
     currentUser.online_user_login = user->getLogin();
 
-    Message50 response;
-    response.status_request = true;
+    Message56 response;
+    response.authorization = true;
+    response.my_login = currentUser.online_user_login;
+    response.my_name = user->getName();
     json j;
     response.to_json(j);
     _network->sendMess(j.dump());

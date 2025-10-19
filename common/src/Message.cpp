@@ -8,6 +8,36 @@
 
 
 /*=====================================
+        Обработка времени
+=====================================*/
+// Функция для получения текущего времени
+Timestamp getCurrentTimestamp() {
+    return std::chrono::system_clock::now();
+}
+
+// Конвертация из Timestamp в строку (MySQL формат)
+std::string timestampToString(const Timestamp& ts) {
+    // Получаем время в системном формате
+    std::time_t tt = std::chrono::system_clock::to_time_t(ts);
+    std::tm tm = *std::localtime(&tt);
+    
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
+    return buffer;
+}
+
+// Конвертация из строки в Timestamp
+Timestamp stringToTimestamp(const std::string& str) {
+    std::tm tm = {};
+    std::istringstream ss(str);
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    
+    std::time_t tt = std::mktime(&tm);
+    return std::chrono::system_clock::from_time_t(tt);
+}
+
+
+/*=====================================
         СООБЩЕНИЯ ОТ КЛИЕНТА
 =====================================*/
 
@@ -138,7 +168,7 @@ void Message51::to_json(json& j) const{
 
 // Передача данных общего чата
 void Message51::from_json(const json& j){
-    history_chat_H = j.at("history_chat_H").get<std::vector<std::vector<std::string>>>();
+    history_chat_H = j.at("history_chat_H").get<std::vector<MessageStruct>>();
 }
 
 
@@ -149,7 +179,7 @@ void Message52::to_json(json& j) const{
 
 // Передача данных приватного чата
 void Message52::from_json(const json& j){
-    history_chat_P = j.at("history_chat_P").get<std::vector<std::pair<std::string, std::string>>>();
+    history_chat_P = j.at("history_chat_P").get<std::vector<MessageStruct>>();
     login_name_friend = j.at("login_name_friend").get<std::pair<std::string, std::string>>(); 
     login_name_MY = j.at("login_name_MY").get<std::pair<std::string, std::string>>(); 
 }
@@ -187,14 +217,16 @@ void Message55::from_json(const json& j){
     status_request = j.at("status_request").get<bool>();
 }
 
-// получение имени юзера
+// Ответ сервера Вы залогинены
 void Message56::to_json(json& j) const{
-    j = {{"type", 56}, {"my_name", my_name}};
+    j = {{"type", 56}, {"authorization", authorization}, {"my_name", my_name}, {"my_login", my_login}};
 }
 
-// получение имени юзера
+// Ответ сервера Вы залогинены
 void Message56::from_json(const json& j){
+    authorization = j.at("authorization").get<bool>();
     my_name = j.at("my_name").get<std::string>();
+    my_login = j.at("my_login").get<std::string>();
 }
 
 

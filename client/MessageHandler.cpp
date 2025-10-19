@@ -6,11 +6,8 @@
 #include <variant>
 #include <utility>
 #include <memory>
-#include "interaction_chat.h"
 #include "UserStatus.h"
 #include "MessageHandler.h"
-#include "interaction_chat.h" // Теперь включаем здесь
-
 
 bool MessageHandler::handleNext(const std::shared_ptr<Message>& message) {
     if (_next) return _next->handle(message);
@@ -29,16 +26,11 @@ bool HandlerMessage50::handle(const std::shared_ptr<Message>& message) {
     
     if (m50->status_request)
     {
-        _status->setMenuAuthoriz(MENU_AUTHORIZATION::AUTHORIZATION_SUCCESSFUL);
+        _status->stopApp();
     }
     else
     {
-    _status->setMenuAuthoriz(MENU_AUTHORIZATION::VOID_REG);
-    _status->setMenuChat(MENU_CHAT::MENU_VOID);
-    _status->setLogin("");
-    _status->setPass("");
-    _status->setName("");
-    _II->display_message("Ошибка в обмене ");
+        // Пока ничего, это вообще теперь только ошибка авторизация на 56
     
     }
     return true;
@@ -53,10 +45,9 @@ bool HandlerMessage51::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    _status->setMess(message);
-    _status->setMessType(51);
-    _status->set_message_status(true);
-    _status->setMenuChat(MENU_CHAT::SHOW_CHAT_H);
+    auto m51 = std::dynamic_pointer_cast<Message51>(message);
+    _status->setMessList(m51->history_chat_H);
+    _status->setChatName("Общий чат");
     return true;
 }
 
@@ -68,9 +59,15 @@ bool HandlerMessage52::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    _status->setMess(message);
-    _status->setMessType(52);
-    _status->set_message_status(true);
+    auto m52 = std::dynamic_pointer_cast<Message52>(message);
+    _status->setMessList(m52->history_chat_P);
+    std::string chatName = "Открыт чат с пользователем: " + m52->login_name_friend.second;
+    _status->setChatName(chatName);
+    FriendData friendD;
+    friendD.login = m52->login_name_friend.first;
+    friendD.name = m52->login_name_friend.second;
+    _status->setFriendOpenChatP(friendD);
+    
     return true;
 }
 

@@ -5,26 +5,18 @@
 #include <string>
 #include <memory>
 #include "UserStatus.h"
-#include "interactive_interface.h"
-#include "console_interface.h"
+
 
 
 class MessageHandler {
 protected:
-    std::shared_ptr<NetworkClient> _network;
     std::shared_ptr<MessageHandler> _next;
-    std::shared_ptr<interactive_interface> _II;
     std::shared_ptr<UserStatus> _status;
    
 public:
-    // MessageHandler(std::shared_ptr<NetworkClient> network, 
-    //                         std::shared_ptr<interactive_interface> II,
-    //                         std::shared_ptr<UserStatus> status);
     MessageHandler(
-    std::shared_ptr<NetworkClient> network, 
-    std::shared_ptr<interactive_interface> II,
     std::shared_ptr<UserStatus> status
-) : _network(network), _II(II), _status(status), _next(nullptr) {};
+) : _status(status), _next(nullptr) {};
     
     virtual ~MessageHandler() = default;
     
