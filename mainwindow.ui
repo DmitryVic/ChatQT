@@ -54,6 +54,18 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="styleButton">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Изменить стиль</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -69,7 +81,7 @@
              <x>0</x>
              <y>0</y>
              <width>211</width>
-             <height>519</height>
+             <height>488</height>
             </rect>
            </property>
           </widget>

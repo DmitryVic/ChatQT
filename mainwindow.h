@@ -20,6 +20,9 @@ public:
   
   static MainWindow* createClient();
   void setStyleDark();
+  void setStyleLight();
+private slots:
+  void on_styleButton_clicked();
 
 private:
   Ui::MainWindow *ui;

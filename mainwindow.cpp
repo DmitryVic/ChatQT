@@ -142,3 +142,16 @@ MainWindow *MainWindow::createClient()
   w->setAttribute(Qt::WA_DeleteOnClose); //Удалит если закроем!!
   return w;
 }
+
+void MainWindow::on_styleButton_clicked()
+{
+  static bool darkStyle = true;
+  if(darkStyle){
+    setStyleLight();
+    darkStyle = false;
+  } else{
+      setStyleDark();
+      darkStyle = true;
+  }
+}
+
