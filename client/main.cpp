@@ -4,8 +4,47 @@
 #include <QLocale>
 #include <QTranslator>
 
-int
-main (int argc, char *argv[])
+#include "Message.h"
+#include "NetworkClient.h"
+#include <iostream>
+#include <unistd.h>
+#include <string.h>
+#ifdef _WIN32
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #pragma comment(lib, "ws2_32.lib") // Подключаем библиотеку Winsock
+    typedef int socklen_t;
+#else
+    #include <unistd.h>
+    #include <sys/socket.h>
+    #include <arpa/inet.h>
+#endif
+#include <nlohmann/json.hpp>
+#include <string>
+#include <memory>
+#include "UserStatus.h"
+#include "interactive_interface.h"
+#include "console_interface.h"
+#include "interaction_chat.h"
+#include <nlohmann/json.hpp>
+#include "User.h"
+#include "MessageHandler.h"
+//локаль
+#include <locale>
+#include <clocale>
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
+
+using namespace std;
+using json = nlohmann::json;
+
+#define PORT 7777
+
+
+int main (int argc, char *argv[])
 {
   QApplication a (argc, argv);
 
