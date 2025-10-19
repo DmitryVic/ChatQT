@@ -239,32 +239,7 @@ void Mediator::setNetworckThreadsSost(bool networckThreadsSost){
 // СТРУКТУРЫ ДАННЫХ | Потокобезопасно ✅
 //##################################################
 
-//получить список сохраненных записей 
-std::vector<RecordShort> Mediator::getListRecord() const{
-    std::lock_guard<std::mutex> lock(_listRecord_mutex);
-    return _listRecord;
-}
 
-//изменить список сохраненных записей 
-void Mediator::setListRecord(std::vector<RecordShort> && listRecord){
-    std::lock_guard<std::mutex> lock(_listRecord_mutex);
-    this->_listRecord = std::move(listRecord);  // перемещение
-    this->resetUI();
-}
-
-
-//получить запись
-RecordFull Mediator::getRecordFull() const{
-    std::lock_guard<std::mutex> lock(_record_full_mutex);
-    return _record_full;
-}
-
-   //изменить запись
-void Mediator::setRecordFull(RecordFull && record_full){
-    std::lock_guard<std::mutex> lock(_listRecord_mutex);
-    this->_record_full = std::move(record_full);  // перемещение
-    this->resetUI();
-}
 
 
 //##################################################

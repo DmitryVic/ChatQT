@@ -58,11 +58,7 @@ private:
     std::atomic<bool> _networckThreadsSost {false};
 
     //#################### СТРУКТУРЫ ДАННЫХ ####################
-    std::vector<RecordShort> _listRecord;
-    mutable std::mutex _listRecord_mutex;
 
-    RecordFull _record_full {};
-    mutable std::mutex _record_full_mutex;
 
 
     //#################### Уведомления ####################
@@ -121,14 +117,7 @@ public:
     bool getSrvStatErrFatall() const;
     //изменить статус флага наличия критических ошибок на сервере (true - ошибки)
     void setSrvStatErrFatall(bool SrvStatErrFatall);
-    //получить флаг наличия НЕ критических ошибок на сервере (true - ошибки)
-    bool getSrvStatErr() const;
-    //изменить статус флага наличия НЕ критических ошибок на сервере (true - ошибки)
-    void setSrvStatErr(bool StatErr);
-    //получить флаг наличия ошибок в обмене (true - ошибки)
-    bool getSrvStatErrMess() const;
-    //изменить статус флага наличия ошибок в обмене (true - ошибки)
-    void setSrvStatErrMess(bool StatErrMess);
+    
     
      //      --- Обработка отправки сообщения ---
     //сообщение отправлено в очередь
@@ -156,19 +145,6 @@ public:
     void setNetworckThreadsSost(bool networckThreadsSost);
 
     //#################### СТРУКТУРЫ ДАННЫХ ####################
-
-    //получить список сохраненных записей 
-    std::vector<RecordShort> getListRecord() const;
-
-    //изменить список сохраненных записей 
-    void setListRecord(std::vector<RecordShort> && listRecord);
-
-
-    //получить запись
-    RecordFull getRecordFull() const;
-
-    //изменить запись
-    void setRecordFull(RecordFull && record_full);
 
 
     //#################### Уведомления ####################

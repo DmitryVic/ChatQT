@@ -127,7 +127,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # линкует клиентский исполняемый файл с общей библиотекой
-# target_link_libraries(Chat_client PRIVATE common)
+target_link_libraries(Chat_client PRIVATE common)
 # общая библиотека нужна только для сборки PRIVATE
 
 # ПОДКЛЮЧАЕМ QT БИБЛИОТЕКИ
@@ -135,6 +135,7 @@ target_link_libraries(Chat_client
   PUBLIC
   ${CHAT_LIBRARIES}
   )
+
 
 # ДИРЕКТОРИИ ДЛЯ INCLUDE
 # Добавляем директорию с Qt исходниками в include path, чтобы

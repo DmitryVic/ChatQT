@@ -1,13 +1,15 @@
 #include "MessageHandler.h"
+#include "NetworkClient.h"
 #include "Message.h"
-#include "Mediator.h"
 #include <nlohmann/json.hpp>
 #include <string>
-#include <vector>
 #include <variant>
 #include <utility>
 #include <memory>
+#include "interaction_chat.h"
+#include "UserStatus.h"
 #include "MessageHandler.h"
+#include "interaction_chat.h" // Теперь включаем здесь
 
 
 bool MessageHandler::handleNext(const std::shared_ptr<Message>& message) {
@@ -15,130 +17,144 @@ bool MessageHandler::handleNext(const std::shared_ptr<Message>& message) {
     return false;
 }
 
-// Обработка для Message101
-// Сообщение о наличии (true) или отсутствие (false) критических ошибок сервера
-bool HandlerMessage101::handle(const std::shared_ptr<Message>& message) {
+// Обработка для Message50 (авторизован или ошибка)
+bool HandlerMessage50::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
-    if (message->getTupe() != 101) {
+    if (message->getTupe() != 50) {
         // Не наше - передаем следующему в цепочке
         return handleNext(message);
     }
     //обрабатываем
-    try
+    auto m50 = std::dynamic_pointer_cast<Message50>(message);
+    
+    if (m50->status_request)
     {
-        std::shared_ptr<Message101> mess = std::dynamic_pointer_cast<Message101>(message);
-        this->_Mediator->setSrvStatErrFatall(mess->status_answer_FatallErr);
-        this->_Mediator->setSrvStatErr(mess->status_answer_Err);
-        return true;
+        _status->setMenuAuthoriz(MENU_AUTHORIZATION::AUTHORIZATION_SUCCESSFUL);
     }
-    catch (const std::exception&)
+    else
     {
-        return false;
+    _status->setMenuAuthoriz(MENU_AUTHORIZATION::VOID_REG);
+    _status->setMenuChat(MENU_CHAT::MENU_VOID);
+    _status->setLogin("");
+    _status->setPass("");
+    _status->setName("");
+    _II->display_message("Ошибка в обмене ");
+    
     }
-}
-
-
-// Обработка для Message102
-// Получена запись
-bool HandlerMessage102::handle(const std::shared_ptr<Message>& message) {
-    // Проверяем, наше ли это сообщение
-    if (message->getTupe() != 102) {
-        // Не наше - передаем следующему в цепочке
-        return handleNext(message);
-    }
-    //обрабатываем
-
-    try
-    {
-        auto m102 = std::dynamic_pointer_cast<Message102>(message);
-        RecordFull record_full = m102->record_full;
-        this->_Mediator->setRecordFull(std::move(record_full)); //Перемещение!
-        
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Ошибка обработки HandlerMessage102: " << e.what() << '\n';
-        return false;
-    }
-
     return true;
 }
 
-// Обработка для Message103
-// Запись отправлена
-bool HandlerMessage103::handle(const std::shared_ptr<Message>& message) {
+
+// Обработка для Message51 (Передача данных общего чата)
+bool HandlerMessage51::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
-    if (message->getTupe() != 103) {
+    if (message->getTupe() != 51) {
         // Не наше - передаем следующему в цепочке
         return handleNext(message);
     }
     //обрабатываем
-
-    try
-    {
-        auto m103 = std::dynamic_pointer_cast<Message103>(message);
-        if (m103->save)
-        {
-            _Mediator->setSaveMessStatus(true);
-        }
-        else
-        {
-            _Mediator->setSaveMessStatus(false);
-        }
-        
-        
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Ошибка обработки HandlerMessage102: " << e.what() << '\n';
-        return false;
-    }
-
+    _status->setMess(message);
+    _status->setMessType(51);
+    _status->set_message_status(true);
+    _status->setMenuChat(MENU_CHAT::SHOW_CHAT_H);
     return true;
 }
 
-// Обработка для Message104
-// Запись отправлена
-bool HandlerMessage104::handle(const std::shared_ptr<Message>& message) {
+// Обработка для Message52 (Передача данных приватного чата)
+bool HandlerMessage52::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
-    if (message->getTupe() != 104) {
+    if (message->getTupe() != 52) {
         // Не наше - передаем следующему в цепочке
         return handleNext(message);
     }
     //обрабатываем
-
-    try
-    {
-        auto m104 = std::dynamic_pointer_cast<Message104>(message);
-        std::vector<RecordShort> l_record;
-        for (auto mesRecord : m104->list_record)
-        {
-            RecordShort tempRecord;
-            tempRecord.id = mesRecord.id;
-            tempRecord.mode = mesRecord.mode;
-            tempRecord.time = mesRecord.time;
-            tempRecord.title = mesRecord.title;
-            l_record.push_back(tempRecord);
-        }
-
-        this->_Mediator->setListRecord(std::move(l_record)); //Перемещение!
-        
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Ошибка обработки HandlerMessage102: " << e.what() << '\n';
-        return false;
-    }
-
+    _status->setMess(message);
+    _status->setMessType(52);
+    _status->set_message_status(true);
     return true;
 }
 
 
 
-// Обработка неизвестного сообщения
+
+// Обработка для Message53 (Передача списка истории приватных чатов)
+bool HandlerMessage53::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 53) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    _status->setMess(message);
+    _status->setMessType(53);
+    _status->set_message_status(true);
+    return true;
+}
+
+
+
+
+
+
+
+
+// Обработка для Message53 (получить список всех юзеров в чате кому написать)
+bool HandlerMessage54::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 54) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    _status->setMess(message);
+    _status->setMessType(54);
+    _status->set_message_status(true);
+    return true;
+}
+
+
+// Обработка для Message53 (Ответ сервера логин занят)
+bool HandlerMessage55::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 55) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    _status->setMenuAuthoriz(MENU_AUTHORIZATION::VOID_REG);
+    _status->setMenuChat(MENU_CHAT::MENU_VOID);
+    _status->setLogin("");
+    _status->setPass("");
+    _status->setName("");
+    _II->display_message("Данный логин занят!");
+    return true;
+}
+
+
+// Обработка для Message56 (Ответ сервера вернуть имя)
+bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 56) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    auto m56 = std::dynamic_pointer_cast<Message56>(message);
+    this->_status->setName(m56->my_name);
+    std::string hi = m56->my_name;
+    hi += ", здраствуйте!";
+    _II->display_message(hi);
+    return true;
+}
+
+// Обработка для Message56 (Ответ сервера вернуть имя)
 bool HandlerErr::handle(const std::shared_ptr<Message>& message) {
     //обрабатываем
-    this->_Mediator->setSrvStatErrMess(true);
-    std::cerr << "Ошибка обработки HandlerErr: не верный тип сиибщения" << '\n';
+    _status->setMenuAuthoriz(MENU_AUTHORIZATION::VOID_REG);
+    _status->setMenuChat(MENU_CHAT::MENU_VOID);
+    _status->setLogin("");
+    _status->setPass("");
+    _status->setName("");
+    _II->display_message("Ошибка ответа сервера");
     return true;
 }

@@ -4,19 +4,27 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <memory>
-#include "Mediator.h"
-
+#include "UserStatus.h"
+#include "interactive_interface.h"
+#include "console_interface.h"
 
 
 class MessageHandler {
 protected:
+    std::shared_ptr<NetworkClient> _network;
     std::shared_ptr<MessageHandler> _next;
-    std::shared_ptr<Mediator> _Mediator;
+    std::shared_ptr<interactive_interface> _II;
+    std::shared_ptr<UserStatus> _status;
    
 public:
+    // MessageHandler(std::shared_ptr<NetworkClient> network, 
+    //                         std::shared_ptr<interactive_interface> II,
+    //                         std::shared_ptr<UserStatus> status);
     MessageHandler(
-    std::shared_ptr<Mediator> Mediator
-) : _Mediator(Mediator), _next(nullptr) {};
+    std::shared_ptr<NetworkClient> network, 
+    std::shared_ptr<interactive_interface> II,
+    std::shared_ptr<UserStatus> status
+) : _network(network), _II(II), _status(status), _next(nullptr) {};
     
     virtual ~MessageHandler() = default;
     
@@ -31,42 +39,8 @@ public:
 };
 
 
-// Обработка для Message101 
-// Сообщение о наличии (true) или отсутствие (false) критических ошибок сервера
-class HandlerMessage101 : public MessageHandler {
-public:
-    //using для наследования конструкторов базового класса
-    using MessageHandler::MessageHandler;
-    
-    bool handle(const std::shared_ptr<Message>& message) override;
-
-};
-
-// Обработка для Message102 
-// Получена запись
-class HandlerMessage102 : public MessageHandler {
-public:
-    //using для наследования конструкторов базового класса
-    using MessageHandler::MessageHandler;
-    
-    bool handle(const std::shared_ptr<Message>& message) override;
-
-};
-
-// Обработка для Message103
-// Запись добавлена
-class HandlerMessage103 : public MessageHandler {
-public:
-    //using для наследования конструкторов базового класса
-    using MessageHandler::MessageHandler;
-    
-    bool handle(const std::shared_ptr<Message>& message) override;
-
-};
-
-// Обработка для Message104
-// Запись добавлена
-class HandlerMessage104 : public MessageHandler {
+// Обработка для Message50 (Ошибка от сервера)
+class HandlerMessage50 : public MessageHandler {
 public:
     //using для наследования конструкторов базового класса
     using MessageHandler::MessageHandler;
@@ -76,7 +50,67 @@ public:
 };
 
 
- 
+// Обработка для Message51 (Передача данных общего чата)
+class HandlerMessage51 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message52 (Передача данных приватного чата)
+class HandlerMessage52 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message53 (Передача списка истории приватных чатов)
+class HandlerMessage53 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message54 (получить список всех юзеров в чате кому написать)
+class HandlerMessage54 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message55 (Ответ сервера логин занят)
+class HandlerMessage55 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message56 (Ответ сервера вернуть имя)
+class HandlerMessage56 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// 
 class HandlerErr : public MessageHandler {
 public:
     //using для наследования конструкторов базового класса
