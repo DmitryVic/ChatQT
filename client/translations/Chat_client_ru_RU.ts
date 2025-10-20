@@ -43,16 +43,11 @@
     </message>
     <message>
         <location filename="../ui/mainwindow.ui" line="53"/>
-        <source>EXIT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/mainwindow.ui" line="65"/>
         <source>Изменить стиль</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/mainwindow.ui" line="172"/>
+        <location filename="../ui/mainwindow.ui" line="160"/>
         <source>Отправить</source>
         <translation type="unfinished"></translation>
     </message>
