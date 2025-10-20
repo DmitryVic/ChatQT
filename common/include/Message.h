@@ -277,10 +277,10 @@ public:
 };
 
 
-// Передача списка истории приватных чатов
+// Передача списка истории приватных чатов (pair<us.login, us.name>)
 class Message53 : public Message {
 public:
-    std::vector<std::pair<std::string, std::string>> list_chat_P;
+    std::vector<std::pair<std::string, std::string>> list_chat_P;    //pair<us.login, us.name>
     
     int getTupe() const override { return 53; }
     
@@ -290,10 +290,10 @@ public:
 };
 
 
-// получить список всех юзеров чата
+// получить список всех юзеров чата (pair<us.login, us.name>)
 class Message54 : public Message {
 public:
-    std::vector<std::pair<std::string, std::string>> list_Users;
+    std::vector<std::pair<std::string, std::string>> list_Users;    //pair<us.login, us.name>
     
     int getTupe() const override { return 54; }
     

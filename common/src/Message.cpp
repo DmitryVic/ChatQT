@@ -185,23 +185,23 @@ void Message52::from_json(const json& j){
 }
 
 
-// Передача списка истории приватных чатов
+// Передача списка истории приватных чатов   pair<us.login, us.name>
 void Message53::to_json(json& j) const{
     j = {{"type", 53}, {"list_chat_P", list_chat_P}};
 }
 
-// Передача списка истории приватных чатов
+// Передача списка истории приватных чатов   pair<us.login, us.name>
 void Message53::from_json(const json& j){
     list_chat_P = j.at("list_chat_P").get<std::vector<std::pair<std::string, std::string>>>();
 }
 
 
-// получить список всех юзеров в чате кому написать
+// получить список всех юзеров в чате кому написать   pair<us.login, us.name>
 void Message54::to_json(json& j) const{
     j = {{"type", 54}, {"list_Users", list_Users}};
 }
 
-// получить список всех юзеров в чате кому написать
+// получить список всех юзеров в чате кому написать   pair<us.login, us.name>
 void Message54::from_json(const json& j){
     list_Users = j.at("list_Users").get<std::vector<std::pair<std::string, std::string>>>();
 }

@@ -74,6 +74,15 @@ private:
     FriendData _friendOpenChatP;
     mutable std::mutex _friendOpenChatPMutex;
 
+    //#################### СПИСКИ ####################
+    
+    //pair<us.login, us.name>
+    std::vector<std::pair<std::string, std::string>> _list_chat_P;
+    mutable std::mutex _list_chat_P_Mutex;
+    //pair<us.login, us.name>
+    std::vector<std::pair<std::string, std::string>> _list_Users;
+    mutable std::mutex _list_Users_Mutex;
+
     //#################### Уведомления ####################
     mutable std::mutex notifiMutex;
     std::string notifi;
@@ -83,6 +92,9 @@ private:
     mutable std::mutex _myUserMutex;
     //Авторизация выполненна или нет, от сервера должны получить true + свой логин с именем 
     std::atomic<bool> _authorizationStatus = false;
+
+    //Логин занят
+    std::atomic<bool> _loginBusy = false;
     
 public:
     UserStatus();
@@ -153,13 +165,25 @@ public:
     //#################### СООБЩЕНИЯ ####################
 
     std::vector<MessageStruct> getMessList() const;
-    void setMessList(std::vector<MessageStruct> messList);
+    void setMessList(std::vector<MessageStruct> &&messList);
 
     std::string getChatName() const;
-    void setChatName(std::string chatName);
+    void setChatName(std::string &&chatName);
 
     FriendData getFriendOpenChatP() const;
-    void setFriendOpenChatP(FriendData friendD);
+    void setFriendOpenChatP(FriendData &&friendD);
+
+    //#################### СПИСКИ ####################
+    
+    //pair<us.login, us.name>
+    std::vector<std::pair<std::string, std::string>> getListChatP() const;
+    //pair<us.login, us.name>
+    void setListChatP(std::vector<std::pair<std::string, std::string>> &&listChatP);
+
+    //pair<us.login, us.name>
+    std::vector<std::pair<std::string, std::string>> getListUsers() const;
+    //pair<us.login, us.name>
+    void setListUsers(std::vector<std::pair<std::string, std::string>> &&listUsers);
 
 
     //#################### Уведомления ####################
@@ -171,12 +195,15 @@ public:
     void setUser(User user);
     User getUser() const;
 
-     //получить флаг авторизации
+    //получить флаг авторизации
     bool getAuthorizationStatus() const;
     //изменить статус флага авторизация
     void setAuthorizationStatus(bool authorizationStatus);
 
-
+    //получить флаг логин занят
+    bool getLoginBusy() const;
+    //изменить статус флага логин занят
+    void setLoginBusy(bool loginBusy);
 
 };
 

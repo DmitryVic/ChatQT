@@ -46,7 +46,7 @@ bool HandlerMessage51::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m51 = std::dynamic_pointer_cast<Message51>(message);
-    _status->setMessList(m51->history_chat_H);
+    _status->setMessList(std::move(m51->history_chat_H));
     _status->setChatName("Общий чат");
     return true;
 }
@@ -60,13 +60,13 @@ bool HandlerMessage52::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m52 = std::dynamic_pointer_cast<Message52>(message);
-    _status->setMessList(m52->history_chat_P);
+    _status->setMessList(std::move(m52->history_chat_P));
     std::string chatName = "Открыт чат с пользователем: " + m52->login_name_friend.second;
-    _status->setChatName(chatName);
+    _status->setChatName(std::move(chatName));
     FriendData friendD;
     friendD.login = m52->login_name_friend.first;
     friendD.name = m52->login_name_friend.second;
-    _status->setFriendOpenChatP(friendD);
+    _status->setFriendOpenChatP(std::move(friendD));
     
     return true;
 }
@@ -82,9 +82,8 @@ bool HandlerMessage53::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    _status->setMess(message);
-    _status->setMessType(53);
-    _status->set_message_status(true);
+    auto m53 = std::dynamic_pointer_cast<Message53>(message);
+    _status->setListChatP(std::move(m53->list_chat_P));
     return true;
 }
 
@@ -103,9 +102,8 @@ bool HandlerMessage54::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    _status->setMess(message);
-    _status->setMessType(54);
-    _status->set_message_status(true);
+    auto m54 = std::dynamic_pointer_cast<Message54>(message);
+    _status->setListChatP(std::move(m54->list_Users));
     return true;
 }
 
@@ -118,17 +116,12 @@ bool HandlerMessage55::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    _status->setMenuAuthoriz(MENU_AUTHORIZATION::VOID_REG);
-    _status->setMenuChat(MENU_CHAT::MENU_VOID);
-    _status->setLogin("");
-    _status->setPass("");
-    _status->setName("");
-    _II->display_message("Данный логин занят!");
+    _status->setLoginBusy(true);
     return true;
 }
 
 
-// Обработка для Message56 (Ответ сервера вернуть имя)
+// Обработка для Message56 ( Ответ сервера Вы залогинены)
 bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
     if (message->getTupe() != 56) {
@@ -137,21 +130,15 @@ bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m56 = std::dynamic_pointer_cast<Message56>(message);
-    this->_status->setName(m56->my_name);
-    std::string hi = m56->my_name;
-    hi += ", здраствуйте!";
-    _II->display_message(hi);
+    _status->setAuthorizationStatus(true);
+    User us(m56->my_login, "", m56->my_name);
+    _status->setUser(us);
     return true;
 }
 
-// Обработка для Message56 (Ответ сервера вернуть имя)
+// ошибка
 bool HandlerErr::handle(const std::shared_ptr<Message>& message) {
     //обрабатываем
-    _status->setMenuAuthoriz(MENU_AUTHORIZATION::VOID_REG);
-    _status->setMenuChat(MENU_CHAT::MENU_VOID);
-    _status->setLogin("");
-    _status->setPass("");
-    _status->setName("");
-    _II->display_message("Ошибка ответа сервера");
+    std::cerr << "HandlerErr::handle: не известный тип сообщения \n";
     return true;
 }

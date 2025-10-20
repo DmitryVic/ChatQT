@@ -199,9 +199,10 @@ std::vector<MessageStruct> UserStatus::getMessList() const{
     return this->_messList;
 }
 
-void UserStatus::setMessList(std::vector<MessageStruct> messList){
+void UserStatus::setMessList(std::vector<MessageStruct> &&messList){
     std::lock_guard<std::mutex> lock(_messListMutex);
     this->_messList = messList;
+    this->resetUI();
 }
 
 std::string UserStatus::getChatName() const{
@@ -209,9 +210,10 @@ std::string UserStatus::getChatName() const{
     return this->_chatName;
 }
 
-void UserStatus::setChatName(std::string chatName){
+void UserStatus::setChatName(std::string &&chatName){
     std::lock_guard<std::mutex> lock(_chatNameMutex);
     this->_chatName = chatName;
+    this->resetUI();
 }
 
 FriendData UserStatus::getFriendOpenChatP() const{
@@ -219,10 +221,42 @@ FriendData UserStatus::getFriendOpenChatP() const{
     return this->_friendOpenChatP;
 }
 
-void UserStatus::setFriendOpenChatP(FriendData friendD){
+void UserStatus::setFriendOpenChatP(FriendData &&friendD){
     std::lock_guard<std::mutex> lock(_friendOpenChatPMutex);
     this->_friendOpenChatP = friendD;
+    this->resetUI();
 }
+
+//##################################################
+//#################### СПИСКИ ####################
+//##################################################
+
+//pair<us.login, us.name>
+std::vector<std::pair<std::string, std::string>> UserStatus::getListChatP() const{
+    std::lock_guard<std::mutex> lock(_list_chat_P_Mutex);
+    return this->_list_chat_P;
+}
+
+//pair<us.login, us.name>
+void UserStatus::setListChatP(std::vector<std::pair<std::string, std::string>> &&listChatP){
+    std::lock_guard<std::mutex> lock(_list_chat_P_Mutex);
+    this->_list_chat_P = listChatP;
+    this->resetUI();
+}
+
+//pair<us.login, us.name>
+std::vector<std::pair<std::string, std::string>> UserStatus::getListUsers() const{
+    std::lock_guard<std::mutex> lock(_list_Users_Mutex);
+    return this->_list_Users;
+}
+
+//pair<us.login, us.name>
+void UserStatus::setListUsers(std::vector<std::pair<std::string, std::string>> &&listUsers){
+    std::lock_guard<std::mutex> lock(_list_Users_Mutex);
+    this->_list_Users = listUsers;
+    this->resetUI();
+}
+
 
 //##################################################
 // Уведомления
@@ -264,3 +298,14 @@ void UserStatus::setNotifi(std::string notifi){
         _authorizationStatus.store(authorizationStatus, std::memory_order_release);
         this->resetUI();
     }
+
+    //получить флаг логин занят
+    bool UserStatus::getLoginBusy() const{
+        return _loginBusy.load(std::memory_order_acquire);
+    }
+
+    //изменить статус флага логин занят
+    void UserStatus::setLoginBusy(bool loginBusy){
+        _authorizationStatus.store(_loginBusy, std::memory_order_release);
+        this->resetUI();
+    }   
