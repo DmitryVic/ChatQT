@@ -17,7 +17,7 @@ endif()
 
 # Подключаем подпроекты
 add_subdirectory(common)
-# add_subdirectory(server)
+add_subdirectory(server)
 add_subdirectory(client)
 
 # Поиск библиотеки json

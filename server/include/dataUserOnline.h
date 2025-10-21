@@ -9,6 +9,7 @@ struct dataUserOnline
     std::string online_user_login;
     int client_socket;
     std::unique_ptr<DataBase> db;
+    std::string recv_buffer_;
 };
 
 // У каждого потока своя копия

@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
+#include "Message.h"
 
 
 class DataBase
@@ -44,7 +45,7 @@ public:
 
 
         // Загрузить историю приватного чата: пары <login, сообщение>
-        virtual bool load_Chat_P(std::shared_ptr<User> user_sender, std::shared_ptr<User> user_recipient, std::vector<std::pair<std::string, std::string>>& out) = 0;
+        virtual bool load_Chat_P(std::shared_ptr<User> user_sender, std::shared_ptr<User> user_recipient, std::vector<MessageStruct>& out) = 0;
 
 
         //запись в общий чат, проверить перед записью существоваие файла!
@@ -52,7 +53,7 @@ public:
 
 
         // Загрузить историю общего чата: пары <login, сообщение>
-        virtual bool load_Chat_H(std::vector<std::vector<std::string>>& out) = 0;
+        virtual bool load_Chat_H(std::vector<MessageStruct>& out) = 0;
 
 };
 

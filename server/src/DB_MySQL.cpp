@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <mysql/mysql.h>
 #include "Logger.h"
+#include "Message.h"
 
 
 DataBaseMySQL::DataBaseMySQL()
@@ -411,7 +412,7 @@ bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_p
     sql_res = nullptr;
 
     std::string request_mysql = 
-    "SELECT uss.login, uss.name, m.text, uss.name" ///////////////////////////////////////////////////////////// ДОРАБОТАТЬ ЗАПРОСЫ ПОД std::vector<MessageStruct>
+    "SELECT uss.login, uss.name, m.text, m.created_at" 
     "FROM messages m "
     "JOIN users uss ON uss.id = m.sender_id "
     "WHERE m.chat_id IN (WITH id2 AS (SELECT uc.chat_id, COUNT(uc.chat_id ) AS c2 "
@@ -446,15 +447,20 @@ bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_p
 
     // Количество полей
     unsigned num_fields = mysql_num_fields(sql_res);
-    if (num_fields != 2) {
+    if (num_fields != 4) {
         mysql_free_result(sql_res);
         sql_res = nullptr;
-        get_logger() << "БД (MySQL) Ожидалось 2 поля в результате запроса получения истории приватного чата";
+        get_logger() << "БД (MySQL) Ожидалось 4 поля в результате запроса получения истории приватного чата";
         return false;
     }
 
     while ((sql_row = mysql_fetch_row(sql_res))) {
-        out.push_back({sql_row[0], sql_row[1]});
+        MessageStruct mesST;
+        mesST.userLogin = sql_row[0];
+        mesST.userName = sql_row[1];
+        mesST.mess = sql_row[2];
+        mesST.time = stringToTimestamp(sql_row[3]);
+        out.emplace_back(mesST);
     }
     mysql_free_result(sql_res);
     sql_res = nullptr;
@@ -485,7 +491,7 @@ bool DataBaseMySQL::write_Chat_H(std::shared_ptr<User> user_sender, const std::s
 bool DataBaseMySQL::load_Chat_H(std::vector<MessageStruct>& out) {
 
     std::string request_mysql = 
-    "SELECT u.login, u.name, m.text "
+    "SELECT u.login, u.name, m.text, m.created_at "
     "FROM messages m "
     "JOIN users u ON u.id = m.sender_id "
     "WHERE m.chat_id IN ("
@@ -513,15 +519,20 @@ bool DataBaseMySQL::load_Chat_H(std::vector<MessageStruct>& out) {
 
     // Количество полей
     unsigned num_fields = mysql_num_fields(sql_res);
-    if (num_fields != 3) {
+    if (num_fields != 4) {
         mysql_free_result(sql_res);
         sql_res = nullptr;
-        get_logger() << "БД (MySQL) Ожидалось 3 поля в результате запроса получения истории общего чата";
+        get_logger() << "БД (MySQL) Ожидалось 4 поля в результате запроса получения истории общего чата";
         return false;
     }
 
     while ((sql_row = mysql_fetch_row(sql_res))) {
-        out.push_back({sql_row[0], sql_row[1], sql_row[2]});
+        MessageStruct mesST;
+        mesST.userLogin = sql_row[0];
+        mesST.userName = sql_row[1];
+        mesST.mess = sql_row[2];
+        mesST.time = stringToTimestamp(sql_row[3]);
+        out.emplace_back(mesST);
     }
     mysql_free_result(sql_res);
     sql_res = nullptr;

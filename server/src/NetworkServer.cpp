@@ -13,7 +13,7 @@
 
 
 void NetworkServer::start() {
-    //создает сокет ТСП
+    //создает сокет
     _server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_server_fd < 0)
         throw std::runtime_error("Сокет _server_fd не создан!");
@@ -141,7 +141,7 @@ std::string NetworkServer::getMess() {
     if (r.first != std::string::npos) {
         size_t start = r.first, end = r.second;
         std::string msg = currentUser.recv_buffer_.substr(start, end - start + 1);
-        currentUser.recv_buffer_.erase(0, end + 1);
+        currentUser.recv_buffer_.erase(0, end + 1); 
 
         // Логирование принятого JSON
         std::string log_mess_socket = "Принято сообщение от сокета " + std::to_string(currentUser.client_socket) + ": \t" + msg;

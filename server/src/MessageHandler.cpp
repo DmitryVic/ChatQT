@@ -135,7 +135,7 @@ bool HandlerMessage3::handle(const std::shared_ptr<Message>& message){
     }
 
     currentUser.db->write_Chat_P(user_sender, user_recipient, m3->mess);
-    std::vector<std::pair<std::string, std::string>> history_chat_P; 
+    std::vector<MessageStruct> history_chat_P;
     currentUser.db->load_Chat_P(user_sender, user_recipient, history_chat_P);
 
     // Отправляем ответ
@@ -188,7 +188,7 @@ bool HandlerMessage4::handle(const std::shared_ptr<Message>& message){
     }
 
     currentUser.db->write_Chat_H(user_sender, m4->mess);
-    std::vector<std::vector<std::string>> history_chat_H; 
+    std::vector<MessageStruct> history_chat_H; 
     currentUser.db->load_Chat_H(history_chat_H);
     
     // Отправляем ответ
@@ -349,7 +349,7 @@ bool HandlerMessage8::handle(const std::shared_ptr<Message>& message){
         throw std::runtime_error("HandlerMessage3: Закрываю соединение...");
     }
 
-    std::vector<std::pair<std::string, std::string>> history_chat_P; 
+    std::vector<MessageStruct> history_chat_P; 
     currentUser.db->load_Chat_P(user_sender, user_recipient, history_chat_P);
 
     // Отправляем ответ
@@ -401,7 +401,7 @@ bool HandlerMessage9::handle(const std::shared_ptr<Message>& message){
         throw std::runtime_error("HandlerMessage4: Закрываю соединение...");
     }
 
-    std::vector<std::vector<std::string>> history_chat_H; 
+    std::vector<MessageStruct> history_chat_H; 
     currentUser.db->load_Chat_H(history_chat_H);
     
     // Отправляем ответ
