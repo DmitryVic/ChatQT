@@ -31,10 +31,10 @@ public:
   void resetChatListArea(); // обновление области списка чатов
   void clearChatListArea(); // очистка области списка чатов
 
+  void resetMainWind();
 
   private slots:
   void on_styleButton_clicked();
-  void resetUI(); // обновление от UserStatus
 
 private:
   Ui::MainWindow *ui;

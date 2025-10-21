@@ -20,30 +20,19 @@ UserStatus::UserStatus() : myUser{"", "", ""} {}
 // Обновление UI
 //##################################################
 
-// регистрация уведомителя (должна вызываться из GUI при инициализации)
-void UserStatus::setUiNotifyCallback(std::function<void()> cb) {
-    // thread-safe assignment (std::function присваивается атомарно только если никто не вызывает одновременно,
-    // обычное присваивание — регистрация делается в инициализации GUI)
-    _notifyCallback = std::move(cb);
+// есть ли обновления ? _uiUpdatePending
+bool UserStatus::hasUpdatePending() const{
+    return this->_uiUpdatePending.load();
+}
+// очистить флаг обновления
+void UserStatus::clearUpdatePending(){
+    this->_uiUpdatePending.store(false);
 }
 
-// Сброс флага обновления - главный поток вызывает после обработки уведомления
-void UserStatus::clearUiUpdatePending() {
-    _uiUpdatePending.store(false, std::memory_order_release);
-}
 
 // Уведомить UI о необходимости обновления (вызывается из рабочих потоков)
 void UserStatus::resetUI() {
-    // помечаем, что UI нужно обновить и - единожды - вызываем callback
-    if (_notifyCallback) {
-        bool expected = false;
-        if (_uiUpdatePending.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
-            // только если ранее не было "pending" — вызываем уведомление
-            try {
-                _notifyCallback(); // callback от UI
-            } catch(...) { /* _______ */ }
-        }
-    }
+    this->_uiUpdatePending.store(true);
 }   
 
 //##################################################

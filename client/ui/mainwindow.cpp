@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include "UserStatus.h"
 #include <QPointer>
+#include <QTimer>
 
 MainWindow::MainWindow (QWidget *parent, std::shared_ptr<UserStatus> userStatus)
     : QMainWindow (parent), ui (new Ui::MainWindow), _userStatus(userStatus)
@@ -23,6 +24,18 @@ MainWindow::MainWindow (QWidget *parent, std::shared_ptr<UserStatus> userStatus)
 
 
        ui->messButtonPush->setText("Отправить 📨");
+
+       // Таймер для проверки обновлений из рабочих потоков
+       QTimer* timer = new QTimer(this);
+       timer->setInterval(200);
+       connect(timer, &QTimer::timeout, this, [this]() {
+              if (_userStatus->hasUpdatePending()) {
+              _userStatus->clearUpdatePending();
+              resetMainWind(); // Вызывается в основном потоке Qt
+              }
+       });
+       timer->start();
+
 
 }
 
@@ -46,10 +59,6 @@ MainWindow *MainWindow::createClient()
 
        QPointer<MainWindow> safeThis = w;
 
-       userStatus->setUiNotifyCallback([safeThis]() {
-       if (!safeThis) return;
-       QMetaObject::invokeMethod(safeThis, "resetUI", Qt::QueuedConnection);
-       });
        return w;
 }
 
@@ -63,7 +72,7 @@ void MainWindow::on_styleButton_clicked()
       setStyleDark();
       darkStyle = true;
   }
-  resetUI();
+  resetMainWind();
 }
 
 
@@ -73,7 +82,7 @@ void MainWindow::setPtrUserStatus(std::shared_ptr<UserStatus> userStatus){
 
 
  // обновление от UserStatus
-void MainWindow::resetUI(){
+void MainWindow::resetMainWind(){
        resetMessagesArea();
        resetChatListArea();
 }
