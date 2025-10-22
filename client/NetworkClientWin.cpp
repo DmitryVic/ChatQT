@@ -9,7 +9,7 @@
 
 
 NetworkClient::NetworkClient(const std::string& ip, int port, std::shared_ptr<UserStatus> status)
-    : server_ip(ip), port(port), sock(INVALID_SOCKET), status(std::move(status)) {}
+    : server_ip(ip), port(port), status(std::move(status)), sock(INVALID_SOCKET) {}
 
 NetworkClient::~NetworkClient() {
 	stopThreads();

@@ -13,7 +13,10 @@
     #endif
     #include <winsock2.h>
     #include <ws2tcpip.h>
-    #pragma comment(lib, "ws2_32.lib") // Подключаем библиотеку Winsock
+    // Только для MSVC оставляем pragma-комментарий на линковку ws2_32
+    #if defined(_MSC_VER)
+    #pragma comment(lib, "ws2_32.lib") // Подключаем библиотеку Winsock (MSVC)
+    #endif
     typedef SOCKET socket_t;         // Определяем тип сокета для Windows
 #else
     #include <unistd.h>             //базовые функции для работы с системой Linux

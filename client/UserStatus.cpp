@@ -295,6 +295,6 @@ void UserStatus::setNotifi(std::string notifi){
 
     //изменить статус флага логин занят
     void UserStatus::setLoginBusy(bool loginBusy){
-        _authorizationStatus.store(_loginBusy, std::memory_order_release);
+        _loginBusy.store(loginBusy, std::memory_order_release);
         this->resetUI();
     }   
