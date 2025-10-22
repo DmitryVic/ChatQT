@@ -29,15 +29,13 @@ class UserStatus; // forward declaration
 
 class NetworkClient {
 private:
-    socket_t sock;              // Единственный дескриптор сокета для общения с сервером
     std::string server_ip;      // IP-адрес сервера для подключения
     int port;                   // Порт сервера для подключения
-
     std::shared_ptr<UserStatus> status; // Умный указатель на UserStatus
-    std::thread recvThread;     // Поток для приёма сообщений
+    socket_t sock;              // Единственный дескриптор сокета для общения с сервером
+        std::thread recvThread;     // Поток для приёма сообщений
     std::thread sendThread;     // Поток для отправки сообщений
     std::atomic<bool> threadsRunning{false};
-
 
     std::string recv_buffer_; // Буфер для накопления данных при приёме
 

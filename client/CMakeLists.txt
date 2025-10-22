@@ -47,8 +47,7 @@ endif()
 
 # Исходники из консольной версии (в корне)
 set(CONSOLE_SRC_FILES
-    # console_interface.cpp 
-    # interaction_chat.cpp   
+
     MessageHandler.cpp
     ${NETWORK_CLIENT_SRC}
     UserStatus.cpp

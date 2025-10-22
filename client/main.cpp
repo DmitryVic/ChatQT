@@ -1,8 +1,8 @@
-#include "mainwindow.h"
 
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include "mainwindow.h"
 
 #include "Message.h"
 #include "NetworkClient.h"
@@ -43,6 +43,14 @@ using json = nlohmann::json;
 
 int main (int argc, char *argv[])
 {
+
+  // Для Linux/Unix: отключаем плагин
+  // Ошибка: QSocketNotifier: Can only be used with threads started with QThread
+  // на Linux GNOME Qt подгружает плагин который при инициализации создает потоки, конфликт Qt QThread
+  #ifdef Q_OS_UNIX
+      qputenv("QT_IM_MODULE", QByteArray("xim"));
+  #endif
+
   QApplication a (argc, argv);
 
   QTranslator translator;

@@ -32,7 +32,7 @@ public:
   void clearChatListArea(); // очистка области списка чатов
 
   void resetMainWind();
-
+  
   private slots:
   void on_styleButton_clicked();
 
