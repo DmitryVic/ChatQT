@@ -10,13 +10,11 @@
 
 class MessageHandler {
 protected:
-    std::shared_ptr<MessageHandler> _next;
     std::shared_ptr<UserStatus> _status;
+    std::shared_ptr<MessageHandler> _next;
    
 public:
-    MessageHandler(
-    std::shared_ptr<UserStatus> status
-) : _status(status), _next(nullptr) {};
+    MessageHandler(std::shared_ptr<UserStatus> status) : _status(status), _next(nullptr) {};
     
     virtual ~MessageHandler() = default;
     

@@ -1,4 +1,3 @@
-#include "BD.h"
 #include "BD_MySQL.h"
 #include "User.h"
 #include <iostream>

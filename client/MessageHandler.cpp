@@ -139,6 +139,6 @@ bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
 // ошибка
 bool HandlerErr::handle(const std::shared_ptr<Message>& message) {
     //обрабатываем
-    std::cerr << "HandlerErr::handle: не известный тип сообщения \n";
+    std::cerr << "HandlerErr::handle: не известный тип сообщения \n" << message;
     return true;
 }
