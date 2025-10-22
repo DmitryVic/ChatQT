@@ -43,18 +43,6 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QPushButton" name="exitButton">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>EXIT</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="styleButton">
           <property name="font">
            <font>
@@ -81,7 +69,7 @@
              <x>0</x>
              <y>0</y>
              <width>211</width>
-             <height>488</height>
+             <height>523</height>
             </rect>
            </property>
           </widget>

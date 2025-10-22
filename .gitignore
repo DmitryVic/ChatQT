@@ -6,6 +6,8 @@ file/
 CMakeCache.txt
 CMakeFiles/
 *.cmake
+
+CMakeLists.txt.user
 # Prerequisites
 *.d
 

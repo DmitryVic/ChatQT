@@ -175,36 +175,36 @@ void MainWindow::setStyleLight(){
     qApp->setStyleSheet(
         // --- Базовые контейнеры ---
         "QMainWindow, QDialog, QWidget {"
-        "    background-color: rgb(248, 248, 248);"  // Светлый фон
-        "    color: rgb(0, 0, 0);"                  // Черный текст
+        "    background-color: rgb(248, 248, 248);"
+        "    color: rgb(0, 0, 0);"                  
         "    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;"
         "    font-size: 14px;"
         "}"
         // --- Кнопки ---
         "QPushButton {"
-        "    background-color: rgb(240, 240, 240);"  // Светло-серый
-        "    color: rgb(0, 0, 0);"                  // Черный текст
-        "    border: 1px solid rgb(200, 200, 200);" // Светлая граница
+        "    background-color: rgb(240, 240, 240);" 
+        "    color: rgb(0, 0, 0);"                  
+        "    border: 1px solid rgb(200, 200, 200);" 
         "    border-radius: 8px;"
         "    padding: 8px 16px;"
         "    font-size: 14px;"
         "}"
         "QPushButton:hover {"
-        "    background-color: rgb(230, 230, 230);"  // Темнее при наведении
-        "    border-color: rgb(0, 122, 255);"       // Синий акцент
+        "    background-color: rgb(230, 230, 230);"  
+        "    border-color: rgb(0, 122, 255);"      
         "}"
         "QPushButton:pressed {"
-        "    background-color: rgb(220, 220, 220);"  // Еще темнее при нажатии
+        "    background-color: rgb(220, 220, 220);"  
         "}"
         "QPushButton:disabled {"
-        "    background-color: rgb(245, 245, 245);"  // Очень светлый
-        "    color: rgb(150, 150, 150);"            // Серый текст
+        "    background-color: rgb(245, 245, 245);"
+        "    color: rgb(150, 150, 150);"       
         "}"
         // --- Стили для кнопок в списке чатов (по objectName 'chat-button') ---
         "QPushButton#chat-button {"
-        "    background-color: rgb(255, 255, 255);"  // Белый фон
-        "    color: rgb(0, 0, 0);"                  // Черный текст
-        "    border: 1px solid rgb(220, 220, 220);" // Светлая граница
+        "    background-color: rgb(255, 255, 255);" 
+        "    color: rgb(0, 0, 0);"                  
+        "    border: 1px solid rgb(220, 220, 220);" 
         "    border-radius: 8px;"
         "    padding: 12px 8px;"
         "    text-align: left;"
@@ -212,30 +212,30 @@ void MainWindow::setStyleLight(){
         "    margin: 2px 0px;"
         "}"
         "QPushButton#chat-button:hover {"
-        "    background-color: rgb(245, 245, 245);"  // Светло-серый при наведении
-        "    border-color: rgb(0, 122, 255);"       // Синий акцент
+        "    background-color: rgb(245, 245, 245);" 
+        "    border-color: rgb(0, 122, 255);"       
         "}"
         "QPushButton#chat-button:pressed {"
-        "    background-color: rgb(235, 235, 235);"  // Темнее при нажатии
+        "    background-color: rgb(235, 235, 235);" 
         "}"
         // --- Текстовое поле ввода ---
         "QTextEdit {"
-        "    background-color: rgb(255, 255, 255);"  // Белый фон
-        "    color: rgb(0, 0, 0);"                  // Черный текст
-        "    border: 1px solid rgb(200, 200, 200);" // Светлая граница
+        "    background-color: rgb(255, 255, 255);"  
+        "    color: rgb(0, 0, 0);"                  
+        "    border: 1px solid rgb(200, 200, 200);"
         "    border-radius: 8px;"
         "    padding: 8px;"
         "    font-size: 14px;"
-        "    selection-background-color: rgb(0, 122, 255);"  // Синий выделение
+        "    selection-background-color: rgb(0, 122, 255);" 
         "}"
         "QTextEdit:focus {"
-        "    border-color: rgb(0, 122, 255);"       // Синий акцент
+        "    border-color: rgb(0, 122, 255);"      
         "}"
         // --- Списки и области прокрутки ---
         "QListView {"
-        "    background-color: rgb(255, 255, 255);"  // Белый фон
-        "    color: rgb(0, 0, 0);"                  // Черный текст
-        "    border: 1px solid rgb(200, 200, 200);" // Светлая граница
+        "    background-color: rgb(255, 255, 255);" 
+        "    color: rgb(0, 0, 0);"                 
+        "    border: 1px solid rgb(200, 200, 200);"
         "    border-radius: 8px;"
         "    padding: 8px;"
         "    font-size: 16px;"
@@ -243,54 +243,54 @@ void MainWindow::setStyleLight(){
         "}"
         "QListView::item {"
         "    padding: 8px;"
-        "    border-bottom: 1px solid rgb(240, 240, 240);"  // Светлая разделитель
+        "    border-bottom: 1px solid rgb(240, 240, 240);" 
         "}"
 
         "QScrollArea {"
-        "    background-color: rgb(255, 255, 255);"  // Белый фон
-        "    border: 1px solid rgb(200, 200, 200);" // Светлая граница
+        "    background-color: rgb(255, 255, 255);" 
+        "    border: 1px solid rgb(200, 200, 200);"
         "    border-radius: 8px;"
         "}"
         // scrollArea
-        "QScrollArea#scrollAreaListChat { background-color: rgb(245, 245, 245); }"  // Светло-серый
-        "QScrollArea#scrollAreaMessage { background-color: rgb(250, 250, 250); }"   // Очень светлый
+        "QScrollArea#scrollAreaListChat { background-color: rgb(245, 245, 245); }"  
+        "QScrollArea#scrollAreaMessage { background-color: rgb(250, 250, 250); }"   
         // --- Скроллбары ---
         "QScrollBar:vertical {"
-        "    background-color: rgb(245, 245, 245);"  // Светлый фон
+        "    background-color: rgb(245, 245, 245);"  
         "    width: 12px;"
         "    border-radius: 6px;"
         "    margin: 0px;"
         "}"
         "QScrollBar::handle:vertical {"
-        "    background-color: rgb(200, 200, 200);"  // Серый ползунок
+        "    background-color: rgb(200, 200, 200);"  
         "    border-radius: 6px;"
         "    min-height: 20px;"
         "}"
-        "QScrollBar::handle:vertical:hover { background-color: rgb(170, 170, 170); }"  // Темнее при наведении
+        "QScrollBar::handle:vertical:hover { background-color: rgb(170, 170, 170); }"  
         "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; border: none; background: none; }"
         "QScrollBar:horizontal {"
-        "    background-color: rgb(245, 245, 245);"  // Светлый фон
+        "    background-color: rgb(245, 245, 245);"  
         "    height: 12px;"
         "    border-radius: 6px;"
         "    margin: 0px;"
         "}"
         "QScrollBar::handle:horizontal {"
-        "    background-color: rgb(200, 200, 200);"  // Серый ползунок
+        "    background-color: rgb(200, 200, 200);"
         "    border-radius: 6px;"
         "    min-width: 20px;"
         "}"
         // --- Сообщения ---
         // contentWidget->setObjectName("message-bubble-my") / "message-bubble-other"
         "QWidget#message-bubble-my {"
-        "    background-color: rgb(0, 122, 255);"    // Синий для моих сообщений
-        "    color: rgb(255, 255, 255);"            // Белый текст
+        "    background-color: rgb(106, 28, 126);"   
+        "    color: rgb(255, 255, 255);"            
         "    border-radius: 12px;"
         "    padding: 8px;"
         "    margin: 4px;"
         "}"
         "QWidget#message-bubble-other {"
-        "    background-color: rgb(240, 240, 240);"  // Светло-серый для чужих
-        "    color: rgb(0, 0, 0);"                  // Черный текст
+        "    background-color: rgb(240, 240, 240);"  
+        "    color: rgb(0, 0, 0);"                 
         "    border-radius: 12px;"
         "    padding: 8px;"
         "    margin: 4px;"
@@ -300,17 +300,17 @@ void MainWindow::setStyleLight(){
         "    background: transparent;"
         "    border: none;"
         "    padding: 0px;"
-        "    color: rgb(0, 0, 0);"                  // Черный текст
+        "    color: rgb(0, 0, 0);"                  
         "    font-size: 14px;"
         "}"
         "QLabel#message-text-my {"
-        "    color: rgb(255, 255, 255);"            // Белый текст для моих сообщений
+        "    color: rgb(255, 255, 255);"           
         "}"
         "QLabel#message-time, QLabel#message-time-my {"
         "    background: transparent;"
         "    font-size: 11px;"
-        "    color: rgb(120, 120, 120);"            // Серый для времени
+        "    color: rgb(120, 120, 120);"           
         "}"
-        "QLabel#message-time-my { color: rgba(255, 255, 255, 0.8); }"  // Полупрозрачный белый
+        "QLabel#message-time-my { color: rgba(255, 255, 255, 0.8); }" 
     );
 }
