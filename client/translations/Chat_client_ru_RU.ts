@@ -24,12 +24,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="24"/>
+        <location filename="../ui/loginform.cpp" line="23"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="25"/>
+        <location filename="../ui/loginform.cpp" line="24"/>
         <source>Password is wrong</source>
         <translation type="unfinished"></translation>
     </message>
@@ -80,24 +80,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="29"/>
-        <location filename="../ui/registrationform.cpp" line="38"/>
-        <location filename="../ui/registrationform.cpp" line="43"/>
+        <location filename="../ui/registrationform.cpp" line="28"/>
+        <location filename="../ui/registrationform.cpp" line="37"/>
+        <location filename="../ui/registrationform.cpp" line="42"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="30"/>
+        <location filename="../ui/registrationform.cpp" line="29"/>
         <source>Passwords not match</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="39"/>
+        <location filename="../ui/registrationform.cpp" line="38"/>
         <source>Incorrect login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="44"/>
+        <location filename="../ui/registrationform.cpp" line="43"/>
         <source>Login alredy exists</source>
         <translation type="unfinished"></translation>
     </message>

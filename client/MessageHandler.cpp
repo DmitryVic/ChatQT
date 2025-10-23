@@ -31,6 +31,7 @@ bool HandlerMessage50::handle(const std::shared_ptr<Message>& message) {
     else
     {
         // Пока ничего, это вообще теперь только ошибка авторизация на 56
+        _status->stopApp();
     
     }
     return true;

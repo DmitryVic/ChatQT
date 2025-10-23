@@ -17,13 +17,13 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow (QWidget *parent = nullptr, std::shared_ptr<class UserStatus> userStatus = nullptr);
+  MainWindow (QWidget *parent = nullptr, std::shared_ptr<UserStatus> userStatus);
   ~MainWindow ();
   
   static MainWindow* createClient();
   void setStyleDark();
   void setStyleLight();
-  void setPtrUserStatus(std::shared_ptr<UserStatus> userStatus);
+  void setUserStatus(std::shared_ptr<UserStatus> userStatus);
   
   void clearMessagesArea(); // очистка области сообщений
   void resetMessagesArea(); // обновление области сообщений
@@ -37,7 +37,7 @@ public:
   void on_styleButton_clicked();
 
 private:
+  std::shared_ptr<UserStatus> _userStatus;
   Ui::MainWindow *ui;
-  std::shared_ptr<class UserStatus> _userStatus;
 };
 #endif // MAINWINDOW_H

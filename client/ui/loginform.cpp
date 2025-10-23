@@ -2,9 +2,8 @@
 #include "./ui_loginform.h"
 #include <QMessageBox>
 
-LoginForm::LoginForm(QWidget *parent) :
-  QWidget(parent),
-  ui(new Ui::LoginForm)
+LoginForm::LoginForm(QWidget *parent, std::shared_ptr<UserStatus> userStatus) :
+  QWidget(parent), _userStatus(userStatus), ui(new Ui::LoginForm)
 {
   ui->setupUi(this);
 }
@@ -40,3 +39,6 @@ void LoginForm::on_registrationPushButton_clicked()
 }
 
 
+void LoginForm::setUserStatus(std::shared_ptr<UserStatus> userStatus) {
+    _userStatus = userStatus;
+}

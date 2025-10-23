@@ -16,7 +16,7 @@
 #include <QTimer>
 
 MainWindow::MainWindow (QWidget *parent, std::shared_ptr<UserStatus> userStatus)
-    : QMainWindow (parent), ui (new Ui::MainWindow), _userStatus(userStatus)
+    :   QMainWindow (parent), _userStatus(userStatus), ui (new Ui::MainWindow)
 {
        ui->setupUi (this);
 
@@ -36,7 +36,41 @@ MainWindow::MainWindow (QWidget *parent, std::shared_ptr<UserStatus> userStatus)
        });
        timer->start();
 
+       /////////////////////////////// Обновления ///////////////////////////////
 
+       // Отправка запроса о получении списка приватных чатов
+       Message5 mess5;
+       mess5.my_login = _userStatus->getUser().getLogin();
+       json j5;
+       mess5.to_json(j5);
+       _userStatus->pushMessageToSend(j5.dump());
+
+       // Отправка запроса о получении списока всех юзеров в чате кому написать
+       Message5 mess6;
+       mess6.my_login = _userStatus->getUser().getLogin();
+       json j6;
+       mess6.to_json(j6);
+       _userStatus->pushMessageToSend(j6.dump());
+
+       // Таймер для отправки запросов на обновление списков
+       QTimer* timer_list = new QTimer(this);
+       timer_list->setInterval(2000);
+       connect(timer_list, &QTimer::timeout, this, [this]() {
+              // Отправка запроса о получении списка приватных чатов
+              Message5 mess5;
+              mess5.my_login = _userStatus->getUser().getLogin();
+              json j5;
+              mess5.to_json(j5);
+              _userStatus->pushMessageToSend(j5.dump());
+
+              // Отправка запроса о получении списока всех юзеров в чате кому написать
+              Message5 mess6;
+              mess6.my_login = _userStatus->getUser().getLogin();
+              json j6;
+              mess6.to_json(j6);
+              _userStatus->pushMessageToSend(j6.dump());
+       });
+       timer_list->start();
 }
 
 MainWindow::~MainWindow () { delete ui; }
@@ -44,19 +78,19 @@ MainWindow::~MainWindow () { delete ui; }
 
 MainWindow *MainWindow::createClient()
 {
+       std::shared_ptr userStatus = std::make_shared<UserStatus>();
+       
        StartScreen s;                  //   СОЗДАЕТСЯ StartScreen
+       s.setUserStatus(userStatus);
        auto result = s.exec();            //   ПОКАЗЫВАЕТСЯ StartScreen (модально)
        if(result == QDialog::Rejected)
        {
        return nullptr;
        }
        // Дальше создается MainWindow после успешного входа (запуск уже в Main)
-       auto w = new MainWindow();
-       w->setAttribute(Qt::WA_DeleteOnClose); //Удалит если закроем!!
-
-       std::shared_ptr userStatus = std::make_shared<UserStatus>();
-       w->setPtrUserStatus(userStatus);
-
+       auto w = new MainWindow(userStatus);
+       // w->setUserStatus(userStatus);
+       w->setAttribute(Qt::WA_DeleteOnClose); //Удалит если закроем!
        QPointer<MainWindow> safeThis = w;
 
        return w;
@@ -76,7 +110,7 @@ void MainWindow::on_styleButton_clicked()
 }
 
 
-void MainWindow::setPtrUserStatus(std::shared_ptr<UserStatus> userStatus){
+void MainWindow::setUserStatus(std::shared_ptr<UserStatus> userStatus){
        this->_userStatus = std::move(userStatus);
 }
 
@@ -253,8 +287,12 @@ void MainWindow::resetChatListArea()
        chatButton->setObjectName("chat-button");
 
        connect(chatButton, &QPushButton::clicked, this, [this]() {
-       // Здесь вставить логику открытия чата
-
+              // запрос на получение данных общео чата
+              Message9 mess9;
+              mess9.user_sender = _userStatus->getUser().getLogin();
+              json j9;
+              mess9.to_json(j9);
+              _userStatus->pushMessageToSend(j9.dump());
        });
 
        scrollLayout->addWidget(chatButton);
@@ -273,8 +311,13 @@ void MainWindow::resetChatListArea()
               chatButton->setObjectName("chat-button");
 
               connect(chatButton, &QPushButton::clicked, this, [chatLogin, this]() {
-              qDebug() << "Выбран чат с пользователем:" << QString::fromStdString(chatLogin);
-              // Здесь вставить логику открытия чата
+              // запрос на получение данных приватного чата
+              Message8 mess8;
+              mess8.user_sender = _userStatus->getUser().getLogin();
+              mess8.user_recipient = chatLogin;
+              json j8;
+              mess8.to_json(j8);
+              _userStatus->pushMessageToSend(j8.dump());
               });
 
               scrollLayout->addWidget(chatButton);
@@ -294,7 +337,16 @@ void MainWindow::resetChatListArea()
 
               connect(chatButton, &QPushButton::clicked, this, [userLogin, this]() {
               qDebug() << "Выбран пользователь:" << QString::fromStdString(userLogin);
-              // Здесь вставить логику открытия чата
+              ////////////////////////////////////////////////////////////////////////////////
+              ////////// TO DO
+              ////////////////////////////////////////////////////////////////////////////////
+              // запрос на получение данных приватного чата
+              Message8 mess8;
+              mess8.user_sender = _userStatus->getUser().getLogin();
+              mess8.user_recipient = userLogin;
+              json j8;
+              mess8.to_json(j8);
+              _userStatus->pushMessageToSend(j8.dump());
               });
 
               scrollLayout->addWidget(chatButton);

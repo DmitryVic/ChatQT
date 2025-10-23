@@ -2,9 +2,8 @@
 #include "./ui_registrationform.h"
 #include <QMessageBox>
 
-RegistrationForm::RegistrationForm(QWidget *parent) :
-  QWidget(parent),
-  ui(new Ui::RegistrationForm)
+RegistrationForm::RegistrationForm(QWidget *parent, std::shared_ptr<UserStatus> userStatus) :
+  QWidget(parent), _userStatus(userStatus), ui(new Ui::RegistrationForm)
 {
   ui->setupUi(this);
 }
@@ -52,4 +51,8 @@ void RegistrationForm::on_buttonBox_accepted()
 void RegistrationForm::on_buttonBox_rejected()
 {
   emit rejected();
+}
+
+void RegistrationForm::setUserStatus(std::shared_ptr<UserStatus> userStatus) {
+    _userStatus = userStatus;
 }

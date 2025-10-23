@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <memory>
+#include <UserStatus.h>
 
 namespace Ui {
 class LoginForm;
@@ -13,9 +14,11 @@ class LoginForm : public QWidget
   Q_OBJECT
 
 public:
-  explicit LoginForm(QWidget *parent = nullptr);
+  explicit LoginForm(QWidget *parent = nullptr, std::shared_ptr<UserStatus> userStatus = nullptr);
   ~LoginForm();
   void setDatabase();
+
+  void setUserStatus(std::shared_ptr<UserStatus> userStatus);
 
 signals:
   void registerRequested();
@@ -30,6 +33,7 @@ private slots:
 
 
 private:
+  std::shared_ptr<UserStatus> _userStatus;
   Ui::LoginForm *ui;
 };
 

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <memory>
+#include <UserStatus.h>
 
 namespace Ui {
 class RegistrationForm;
@@ -13,8 +14,10 @@ class RegistrationForm : public QWidget
   Q_OBJECT
 
 public:
-  explicit RegistrationForm(QWidget *parent = nullptr);
+  explicit RegistrationForm(QWidget *parent = nullptr, std::shared_ptr<UserStatus> userStatus = nullptr);
   ~RegistrationForm();
+
+  void setUserStatus(std::shared_ptr<UserStatus> userStatus);
 
 signals:
   void loginRequested();
@@ -27,6 +30,7 @@ private slots:
   void on_buttonBox_rejected();
 
 private:
+  std::shared_ptr<class UserStatus> _userStatus;
   Ui::RegistrationForm *ui;
 };
 
