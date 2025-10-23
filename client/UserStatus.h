@@ -24,6 +24,9 @@ struct FriendData
     std::string login;
 };
 
+// Добавить потом личку
+// TO DO
+enum chat {PRIVATE_CHAT, SHARED_CHAT};
 
 class UserStatus
 {
@@ -71,6 +74,9 @@ private:
 
     FriendData _friendOpenChatP;
     mutable std::mutex _friendOpenChatPMutex;
+
+    chat _chatOpen = SHARED_CHAT;
+    mutable std::mutex _chatOpenMutex;
 
     //#################### СПИСКИ ####################
     
@@ -168,6 +174,9 @@ public:
 
     FriendData getFriendOpenChatP() const;
     void setFriendOpenChatP(FriendData &&friendD);
+
+    chat getChatOpen() const;
+    void setChatOpen(chat chatOpen);
 
     //#################### СПИСКИ ####################
     

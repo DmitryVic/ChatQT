@@ -47,6 +47,7 @@ bool HandlerMessage51::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m51 = std::dynamic_pointer_cast<Message51>(message);
+    _status->setChatOpen(chat::SHARED_CHAT);
     _status->setMessList(std::move(m51->history_chat_H));
     _status->setChatName("Общий чат");
     return true;
@@ -61,6 +62,7 @@ bool HandlerMessage52::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m52 = std::dynamic_pointer_cast<Message52>(message);
+    _status->setChatOpen(chat::PRIVATE_CHAT);
     _status->setMessList(std::move(m52->history_chat_P));
     std::string chatName = "Открыт чат с пользователем: " + m52->login_name_friend.second;
     _status->setChatName(std::move(chatName));

@@ -36,7 +36,9 @@ public:
   private slots:
   void on_styleButton_clicked();
 
-private:
+  void on_messButtonPush_clicked();
+
+  private:
   std::shared_ptr<UserStatus> _userStatus;
   Ui::MainWindow *ui;
 };

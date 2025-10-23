@@ -216,6 +216,16 @@ void UserStatus::setFriendOpenChatP(FriendData &&friendD){
     this->resetUI();
 }
 
+chat UserStatus::getChatOpen() const{
+  std::lock_guard<std::mutex> lock(_chatOpenMutex);
+  return this->_chatOpen;
+}
+void UserStatus::setChatOpen(chat chatOpen){
+  std::lock_guard<std::mutex> lock(_chatOpenMutex);
+  this->_chatOpen = chatOpen;
+  //this->resetUI(); // обновление и так будет при принятом сообщении
+}
+
 //##################################################
 //#################### СПИСКИ ####################
 //##################################################

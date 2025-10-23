@@ -356,3 +356,19 @@ void MainWindow::resetChatListArea()
        // Добавляем растягивающий элемент, чтобы кнопки прижимались вверх
        scrollLayout->addStretch();
 }
+
+
+void MainWindow::on_messButtonPush_clicked()
+{
+  switch (_userStatus->getChatOpen()) {
+    case chat::SHARED_CHAT:
+
+      break;
+    case chat::PRIVATE_CHAT:
+
+      break;
+    default:
+      break;
+    }
+}
+
