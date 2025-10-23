@@ -46,7 +46,7 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
        _userStatus->pushMessageToSend(j5.dump());
 
        // Отправка запроса о получении списока всех юзеров в чате кому написать
-       Message5 mess6;
+       Message6 mess6;
        mess6.my_login = _userStatus->getUser().getLogin();
        json j6;
        mess6.to_json(j6);
@@ -64,7 +64,7 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
               _userStatus->pushMessageToSend(j5.dump());
 
               // Отправка запроса о получении списока всех юзеров в чате кому написать
-              Message5 mess6;
+              Message6 mess6;
               mess6.my_login = _userStatus->getUser().getLogin();
               json j6;
               mess6.to_json(j6);
@@ -73,7 +73,11 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
        timer_list->start();
 }
 
-MainWindow::~MainWindow () { delete ui; }
+MainWindow::~MainWindow () { 
+       if (_userStatus)
+              _userStatus->stopApp();
+       delete ui;
+ }
 
 
 MainWindow *MainWindow::createClient(std::shared_ptr<UserStatus> userStatus)
