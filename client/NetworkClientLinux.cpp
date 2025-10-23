@@ -16,7 +16,7 @@
 
 // Конструктор: принимает shared_ptr<UserStatus>
 NetworkClient::NetworkClient(const std::string& ip, int port, std::shared_ptr<UserStatus> status)
-    : server_ip(ip), port(port), sock(-1), status(std::move(status)) {}  // -1 = сокет не инициализирован
+    : server_ip(ip), port(port), status(std::move(status)), sock(-1) {}  // -1 = сокет не инициализирован
 
         
 NetworkClient::~NetworkClient() {
