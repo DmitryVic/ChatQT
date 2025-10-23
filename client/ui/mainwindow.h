@@ -17,10 +17,10 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow (QWidget *parent = nullptr, std::shared_ptr<UserStatus> userStatus);
+  MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent = nullptr);
   ~MainWindow ();
   
-  static MainWindow* createClient();
+  static MainWindow* createClient(std::shared_ptr<UserStatus> userStatus);
   void setStyleDark();
   void setStyleLight();
   void setUserStatus(std::shared_ptr<UserStatus> userStatus);

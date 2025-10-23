@@ -45,5 +45,10 @@ void StartScreen::onRejectRequested()
 }
 
 void StartScreen::setUserStatus(std::shared_ptr<UserStatus> userStatus) {
-    _userStatus = userStatus;
+  _userStatus = userStatus;
+  // Пробросить указатель в дочерние виджеты, если UI уже инициализирован
+  if (ui) {
+    if (ui->loginWidget) ui->loginWidget->setUserStatus(_userStatus);
+    if (ui->registerWidget) ui->registerWidget->setUserStatus(_userStatus);
+  }
 }

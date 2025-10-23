@@ -15,8 +15,8 @@
 #include <QPointer>
 #include <QTimer>
 
-MainWindow::MainWindow (QWidget *parent, std::shared_ptr<UserStatus> userStatus)
-    :   QMainWindow (parent), _userStatus(userStatus), ui (new Ui::MainWindow)
+MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
+: QMainWindow(parent), _userStatus(std::move(userStatus)), ui(new Ui::MainWindow)
 {
        ui->setupUi (this);
 
@@ -76,12 +76,9 @@ MainWindow::MainWindow (QWidget *parent, std::shared_ptr<UserStatus> userStatus)
 MainWindow::~MainWindow () { delete ui; }
 
 
-MainWindow *MainWindow::createClient()
+MainWindow *MainWindow::createClient(std::shared_ptr<UserStatus> userStatus)
 {
-       std::shared_ptr userStatus = std::make_shared<UserStatus>();
-       
-       StartScreen s;                  //   СОЗДАЕТСЯ StartScreen
-       s.setUserStatus(userStatus);
+       StartScreen s(nullptr, userStatus); //   СОЗДАЕТСЯ StartScreen
        auto result = s.exec();            //   ПОКАЗЫВАЕТСЯ StartScreen (модально)
        if(result == QDialog::Rejected)
        {

@@ -24,13 +24,25 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="23"/>
+        <location filename="../ui/loginform.cpp" line="27"/>
+        <location filename="../ui/loginform.cpp" line="64"/>
+        <location filename="../ui/loginform.cpp" line="81"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="24"/>
+        <location filename="../ui/loginform.cpp" line="28"/>
         <source>Password is wrong</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/loginform.cpp" line="65"/>
+        <source>Timeout waiting for server response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/loginform.cpp" line="82"/>
+        <source>Login is busy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -75,30 +87,35 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.ui" line="84"/>
+        <location filename="../ui/registrationform.ui" line="63"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/registrationform.ui" line="94"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="28"/>
-        <location filename="../ui/registrationform.cpp" line="37"/>
-        <location filename="../ui/registrationform.cpp" line="42"/>
+        <location filename="../ui/registrationform.cpp" line="32"/>
+        <location filename="../ui/registrationform.cpp" line="55"/>
+        <location filename="../ui/registrationform.cpp" line="71"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="29"/>
+        <location filename="../ui/registrationform.cpp" line="33"/>
         <source>Passwords not match</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="38"/>
-        <source>Incorrect login</source>
+        <location filename="../ui/registrationform.cpp" line="56"/>
+        <source>Timeout waiting for server response</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="43"/>
-        <source>Login alredy exists</source>
+        <location filename="../ui/registrationform.cpp" line="72"/>
+        <source>Login is busy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
