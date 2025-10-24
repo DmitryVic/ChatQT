@@ -362,10 +362,47 @@ void MainWindow::on_messButtonPush_clicked()
 {
   switch (_userStatus->getChatOpen()) {
     case chat::SHARED_CHAT:
-
+       // запрос на получение данных приватного чата
+              {
+              Message4 mess4;
+              mess4.login_user_sender = _userStatus->getUser().getLogin();
+              mess4.name_user_sender = _userStatus->getUser().getName();
+              mess4.mess = ui->message_panel->toPlainText().toStdString();
+              ui->message_panel->clear();
+              json j4;
+              mess4.to_json(j4);
+              _userStatus->pushMessageToSend(j4.dump());
+              
+              // запрос на получение данных общео чата
+              Message9 mess9;
+              mess9.user_sender = _userStatus->getUser().getLogin();
+              json j9;
+              mess9.to_json(j9);
+              _userStatus->pushMessageToSend(j9.dump());
+       }
       break;
     case chat::PRIVATE_CHAT:
+       {
+              Message3 mess3;
+              mess3.user_sender = _userStatus->getUser().getLogin();
+              mess3.user_recipient = _userStatus->getLoginBusy();
+              mess3.mess = ui->message_panel->toPlainText().toStdString();
+              ui->message_panel->clear();
+              json j3;
+              mess3.to_json(j3);
+              _userStatus->pushMessageToSend(j3.dump());
 
+
+              // запрос на получение данных приватного чата
+              Message8 mess8;
+              mess8.user_sender = _userStatus->getUser().getLogin();
+              mess8.user_recipient = _userStatus->getLoginBusy();
+              json j8;
+              mess8.to_json(j8);
+              _userStatus->pushMessageToSend(j8.dump());
+              
+
+       }
       break;
     default:
       break;
