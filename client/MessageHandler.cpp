@@ -106,7 +106,7 @@ bool HandlerMessage54::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m54 = std::dynamic_pointer_cast<Message54>(message);
-    _status->setListChatP(std::move(m54->list_Users));
+    _status->setListUsers(std::move(m54->list_Users));
     return true;
 }
 

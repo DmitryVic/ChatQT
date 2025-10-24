@@ -282,7 +282,7 @@ void MainWindow::resetChatListArea()
 
        //ДОБАВЛЯЕМ ОБЩИЙ ЧАТ
        QPushButton *chatButton = new QPushButton(scrollContent);
-       chatButton->setText(QString::fromStdString("Общий чат"));
+       chatButton->setText(QString::fromStdString("👥 Общий чат"));
        chatButton->setMinimumHeight(50);
        chatButton->setMaximumHeight(50);
        chatButton->setObjectName("chat-button");
@@ -304,9 +304,9 @@ void MainWindow::resetChatListArea()
        for (const auto& chat : lastChatP) {
               const std::string& userLogin = chat.first;
               const std::string& userName = chat.second;
-              const std::string& bottonTitle = "Приватный чат: " + userName + " (" + userLogin + ")";
+              const std::string& bottonTitle = "💬 " + userName + " (" + userLogin + ")";
               QPushButton *chatButton = new QPushButton(scrollContent);
-              chatButton->setText(QString::fromStdString(userName));
+              chatButton->setText(QString::fromStdString(bottonTitle));
               chatButton->setMinimumHeight(50);
               chatButton->setMaximumHeight(50);
               chatButton->setObjectName("chat-button");
@@ -332,7 +332,7 @@ void MainWindow::resetChatListArea()
        for (const auto& user : listUsers) {
               const std::string& userLogin = user.first;
               const std::string& userName = user.second;
-              const std::string& bottonTitle = "Написать пользователю: " +  userName + " (" + userLogin + ")";
+              const std::string& bottonTitle = "👤 " +  userName + " (" + userLogin + ")";
               QPushButton *chatButton = new QPushButton(scrollContent);
               chatButton->setText(QString::fromStdString(bottonTitle));
               chatButton->setMinimumHeight(50);
@@ -340,7 +340,6 @@ void MainWindow::resetChatListArea()
               chatButton->setObjectName("chat-button");
 
               connect(chatButton, &QPushButton::clicked, this, [userLogin, userName, this]() {
-              qDebug() << "Выбран пользователь:" << QString::fromStdString(userLogin);
               ////////////////////////////////////////////////////////////////////////////////
               ////////// TO DO
               ////////////////////////////////////////////////////////////////////////////////

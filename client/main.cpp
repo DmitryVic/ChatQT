@@ -94,10 +94,7 @@ int main (int argc, char *argv[])
       {
           while (userStatus->getNetworckConnect())
           {
-              cout << "Жду сообщения\n";
-              userStatus->setNotifi("После заполнения полей, нажмите на кнопку \"Отправить\" для фиксации");
               std::string json_str = userStatus->waitAndPopAcceptedMessage();
-              cout << "обрабатываю\n";
               
               if(json_str == "") {
                   cout << "Пусто\n";
