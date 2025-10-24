@@ -411,17 +411,24 @@ bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_p
     sql_res = nullptr;
 
     std::string request_mysql = 
-    "SELECT uss.login, uss.name, m.text, m.created_at" 
+    "SELECT uss.login, uss.name, m.text, m.created_at "
     "FROM messages m "
     "JOIN users uss ON uss.id = m.sender_id "
-    "WHERE m.chat_id IN (WITH id2 AS (SELECT uc.chat_id, COUNT(uc.chat_id ) AS c2 "
-        "FROM user_chats uc "
-        "JOIN users u ON uc.user_id = u.id "
-        "WHERE u.login IN ('"
-            + escapeString(user_sender->getLogin()) + "', '" 
-            + escapeString(user_recipient->getLogin()) + "') "
-            "GROUP BY uc.chat_id) SELECT chat_id FROM id2 WHERE c2 = 2) "
-            "ORDER BY m.created_at;";
+    "WHERE m.chat_id IN ("
+    " SELECT chat_id FROM ("
+    " SELECT uc.chat_id, COUNT(uc.chat_id) AS c2 "
+    " FROM user_chats uc "
+    " JOIN users u ON uc.user_id = u.id "
+    " WHERE u.login IN ('"
+    + escapeString(user_sender->getLogin()) +
+    "', '"
+    + escapeString(user_recipient->getLogin()) +
+    "') "
+    " GROUP BY uc.chat_id"
+    " ) AS id2 "
+    " WHERE c2 = 2"
+    ") "
+    "ORDER BY m.created_at";
 
     if (mysql_query(&sql_mysql, request_mysql.c_str())) {
         get_logger() << "Ошибка поиска чата load_Chat_P: " << mysql_error(&sql_mysql);

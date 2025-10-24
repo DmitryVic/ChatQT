@@ -302,25 +302,28 @@ void MainWindow::resetChatListArea()
        std::vector<std::pair<std::string, std::string>> lastChatP = _userStatus->getListChatP(); // Загружаем список чатов из UserStatus pair<us.login, us.name>
 
        for (const auto& chat : lastChatP) {
-              const std::string& chatLogin = chat.first;
-              const std::string& chatName = chat.second;
-
+              const std::string& userLogin = chat.first;
+              const std::string& userName = chat.second;
+              const std::string& bottonTitle = "Приватный чат: " + userName + " (" + userLogin + ")";
               QPushButton *chatButton = new QPushButton(scrollContent);
-              chatButton->setText(QString::fromStdString(chatName));
+              chatButton->setText(QString::fromStdString(userName));
               chatButton->setMinimumHeight(50);
               chatButton->setMaximumHeight(50);
               chatButton->setObjectName("chat-button");
 
-              connect(chatButton, &QPushButton::clicked, this, [chatLogin, this]() {
-              // запрос на получение данных приватного чата
+              connect(chatButton, &QPushButton::clicked, this, [userLogin, userName, this]() {
+             // запрос на получение данных приватного чата
               Message8 mess8;
               mess8.user_sender = _userStatus->getUser().getLogin();
-              mess8.user_recipient = chatLogin;
+              mess8.user_recipient = userLogin;
               json j8;
               mess8.to_json(j8);
               _userStatus->pushMessageToSend(j8.dump());
+              FriendData friendD;
+              friendD.login = userLogin;
+              friendD.name = userName;
+              _userStatus->setFriendOpenChatP(std::move(friendD));
               });
-
               scrollLayout->addWidget(chatButton);
        }
 
@@ -329,14 +332,14 @@ void MainWindow::resetChatListArea()
        for (const auto& user : listUsers) {
               const std::string& userLogin = user.first;
               const std::string& userName = user.second;
-
+              const std::string& bottonTitle = "Написать пользователю: " +  userName + " (" + userLogin + ")";
               QPushButton *chatButton = new QPushButton(scrollContent);
-              chatButton->setText(QString::fromStdString(userName));
+              chatButton->setText(QString::fromStdString(bottonTitle));
               chatButton->setMinimumHeight(50);
               chatButton->setMaximumHeight(50);
               chatButton->setObjectName("chat-button");
 
-              connect(chatButton, &QPushButton::clicked, this, [userLogin, this]() {
+              connect(chatButton, &QPushButton::clicked, this, [userLogin, userName, this]() {
               qDebug() << "Выбран пользователь:" << QString::fromStdString(userLogin);
               ////////////////////////////////////////////////////////////////////////////////
               ////////// TO DO
@@ -350,6 +353,7 @@ void MainWindow::resetChatListArea()
               _userStatus->pushMessageToSend(j8.dump());
               FriendData friendD;
               friendD.login = userLogin;
+              friendD.name = userName;
               _userStatus->setFriendOpenChatP(std::move(friendD));
               });
 
@@ -395,7 +399,7 @@ void MainWindow::on_messButtonPush_clicked()
               json j3;
               mess3.to_json(j3);
               _userStatus->pushMessageToSend(j3.dump());
-
+              
 
               // запрос на получение данных приватного чата
               Message8 mess8;
