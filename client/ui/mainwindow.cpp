@@ -348,6 +348,9 @@ void MainWindow::resetChatListArea()
               json j8;
               mess8.to_json(j8);
               _userStatus->pushMessageToSend(j8.dump());
+              FriendData friendD;
+              friendD.login = userLogin;
+              _userStatus->setFriendOpenChatP(std::move(friendD));
               });
 
               scrollLayout->addWidget(chatButton);
@@ -385,7 +388,8 @@ void MainWindow::on_messButtonPush_clicked()
        {
               Message3 mess3;
               mess3.user_sender = _userStatus->getUser().getLogin();
-              mess3.user_recipient = _userStatus->getLoginBusy();
+
+              mess3.user_recipient = _userStatus->getFriendOpenChatP().login;
               mess3.mess = ui->message_panel->toPlainText().toStdString();
               ui->message_panel->clear();
               json j3;
@@ -396,7 +400,7 @@ void MainWindow::on_messButtonPush_clicked()
               // запрос на получение данных приватного чата
               Message8 mess8;
               mess8.user_sender = _userStatus->getUser().getLogin();
-              mess8.user_recipient = _userStatus->getLoginBusy();
+              mess8.user_recipient = _userStatus->getFriendOpenChatP().login;
               json j8;
               mess8.to_json(j8);
               _userStatus->pushMessageToSend(j8.dump());
