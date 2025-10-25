@@ -18,7 +18,7 @@ endif()
 # Подключаем подпроекты
 add_subdirectory(common)
 add_subdirectory(server)
-# add_subdirectory(client)
+add_subdirectory(client)
 
 # Поиск библиотеки json
 find_package(nlohmann_json 3.7.3 REQUIRED)
