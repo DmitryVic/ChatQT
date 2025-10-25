@@ -18,6 +18,10 @@ std::string User::getPass() const{
     return this->_pasword;
 }
 
+// Получить ключ сессии
+std::string User::getKey() const{
+    return this->_key;
+}
 
 // Задать логин
 void User::setLogin(std::string& login){
@@ -32,4 +36,9 @@ void User::setName(std::string& name){
 // Задать проль не безопасный
 void User::setPass(std::string& pasword){
     this->_pasword = pasword;
+}
+
+// Задать ключ сессии
+void User::setKey(std::string& key){
+    this->_key = key;
 }

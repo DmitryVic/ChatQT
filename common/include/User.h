@@ -9,6 +9,7 @@ private:
     std::string _login;                                  // Уникален Максимум 10 знаков анлгл, запретить другие
     std::string _pasword;                               //храниться хэш вместо пароля
     std::string _name;
+    std::string _key;
 
 public:
     // Передать логин, пароль, имя
@@ -26,6 +27,9 @@ public:
     // Получить проль не безопасный
     std::string getPass() const;
 
+    // Получить ключ сессии
+    std::string getKey() const;
+
     // Задать логин
     void setLogin(std::string& login);
 
@@ -34,6 +38,10 @@ public:
 
     // Задать проль не безопасный
     void setPass(std::string& pasword);
+
+    // Задать ключ сессии
+    void setKey(std::string& key);
+
 };
 
 
