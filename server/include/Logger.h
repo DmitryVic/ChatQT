@@ -12,6 +12,8 @@
 class Logger
 {
 private:
+    static constexpr size_t MAX_FILE_SIZE = 1 * 1024 * 1024;  // 1 МБ
+    
     std::string logFile = "log.txt";
     std::string logFileMessUsers = "logUsers.txt";
     std::string logFilePath = "file/";
@@ -21,7 +23,8 @@ private:
 
     std::shared_mutex sh_mtx_log;
     std::shared_mutex mtx_log_users;
-
+    
+    void checkAndRotateLog(const std::string& filename);
     
 public:
     Logger();

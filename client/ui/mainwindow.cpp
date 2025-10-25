@@ -14,6 +14,8 @@
 #include "UserStatus.h"
 #include <QPointer>
 #include <QTimer>
+#include <QScrollBar>
+
 
 MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
 : QMainWindow(parent), _userStatus(std::move(userStatus)), ui(new Ui::MainWindow)
@@ -131,6 +133,9 @@ void MainWindow::resetMainWind(){
        resetMessagesArea();
        resetChatListArea();
        resetNotifi();
+       // скроллим вниз область сообщений
+       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
+       vScrollBar->setValue(vScrollBar->maximum());
 }
 
 void MainWindow::resetNotifi(){

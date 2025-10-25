@@ -7,7 +7,9 @@
 #include <mutex>
 #include <shared_mutex>
 #include <sys/stat.h>  // mkdir
+#include <filesystem>
 
+namespace fs = std::filesystem;
 
 Logger::Logger()
 {
@@ -43,12 +45,55 @@ Logger::~Logger()
         logStreamMessUsers.close();
 }
 
+// Если размер файла превышает MAX_FILE_SIZE, выполняем ротацию
+// ограничение на количество файлов: log.txt - 10, logUsers.txt - 3
+// метод самм удаляет старые файлы и переименовывает текущий
+void Logger::checkAndRotateLog(const std::string& filename) {
+    std::string fullPath = logFilePath + filename;
+    if (fs::exists(fullPath)) {
+        size_t fileSize = fs::file_size(fullPath);
+        if (fileSize >= MAX_FILE_SIZE) {
+            if (logStream.is_open()) logStream.close();
+            if (logStreamMessUsers.is_open()) logStreamMessUsers.close();
+
+            // Определяем максимальное количество файлов в зависимости от типа лога
+            int maxFiles = (filename == logFile) ? 10 : 3;
+            
+            // Удаляем самый старый файл, если он существует
+            std::string oldestFile = fullPath + "." + std::to_string(maxFiles);
+            if (fs::exists(oldestFile)) {
+                fs::remove(oldestFile);
+            }
+
+            // Сдвигаем существующие файлы
+            for (int i = maxFiles - 1; i >= 1; --i) {
+                std::string oldFile = fullPath + "." + std::to_string(i);
+                std::string newFile = fullPath + "." + std::to_string(i + 1);
+                if (fs::exists(oldFile)) {
+                    fs::rename(oldFile, newFile);
+                }
+            }
+
+            // Переименовываем текущий файл
+            fs::rename(fullPath, fullPath + ".1");
+            
+            // Переоткрываем файл
+            if (filename == logFile) {
+                logStream.open(fullPath, std::ios::app);
+            } else {
+                logStreamMessUsers.open(fullPath, std::ios::app);
+            }
+        }
+    }
+}
 
 void Logger::log(const std::string& message)
 {
     std::unique_lock lock(sh_mtx_log);
     if (logStream.is_open())
     {
+        checkAndRotateLog(logFile);
+        
         // Получаем текущее время
         std::time_t now = std::time(nullptr);
         char buf[100];
@@ -65,6 +110,8 @@ void Logger::logMessageUser(const std::string& message)
     std::unique_lock lock(mtx_log_users);
     if (logStreamMessUsers.is_open())
     {
+        checkAndRotateLog(logFileMessUsers);
+        
         // Получаем текущее время
         std::time_t now = std::time(nullptr);
         char buf[100];
