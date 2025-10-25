@@ -3,7 +3,7 @@
 #include "BD.h"
 #include "Message.h"
 #include <nlohmann/json.hpp>
-#include "hashPass.h"
+#include "sha1.h"
 #include <string>
 #include <variant>
 #include <memory>
@@ -32,8 +32,7 @@ bool HandlerMessage1::handle(const std::shared_ptr<Message>& message) {
     // Логика обработки
     std::shared_ptr<User> user = currentUser.db->search_User(m1->login);
 
-    bool authSuccess = user && (hashPassword(m1->pass) == user->getPass());
-    
+    bool authSuccess = user && (hashToString(sha1(m1->pass)) == user->getPass());
     
     // Формируем ответ
     Message56 response;
@@ -80,8 +79,7 @@ bool HandlerMessage2::handle(const std::shared_ptr<Message>& message) {
     }
 
     
-
-    std::shared_ptr<User> user = std::make_shared<User>(m2->login, hashPassword(m2->pass), m2->name);
+    std::shared_ptr<User> user = std::make_shared<User>(m2->login, hashToString(sha1(m2->pass)), m2->name);
     currentUser.db->write_User(user);
     //Фиксация авторизации
     currentUser.online_user_login = user->getLogin();

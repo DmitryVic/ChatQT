@@ -27,6 +27,7 @@ if(UNIX)
         src/NetworkServer.cpp
         src/MessageHandler.cpp
         src/Logger.cpp
+        src/sha1.cpp
     )
 
     target_compile_definitions(chat_server PRIVATE SET_GLOBAL_LOCALE_LINUX)
