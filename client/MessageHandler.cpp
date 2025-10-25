@@ -14,7 +14,7 @@ bool MessageHandler::handleNext(const std::shared_ptr<Message>& message) {
     return false;
 }
 
-// Обработка для Message50 (авторизован или ошибка)
+// Обработка для Message50 (ошибка от сервера)
 bool HandlerMessage50::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
     if (message->getTupe() != 50) {
@@ -32,7 +32,6 @@ bool HandlerMessage50::handle(const std::shared_ptr<Message>& message) {
     {
         // Пока ничего, это вообще теперь только ошибка авторизация на 56
         _status->stopApp();
-    
     }
     return true;
 }
@@ -50,6 +49,8 @@ bool HandlerMessage51::handle(const std::shared_ptr<Message>& message) {
     _status->setChatOpen(chat::SHARED_CHAT);
     _status->setMessList(std::move(m51->history_chat_H));
     _status->setChatName("Общий чат");
+    // флаг что сообщения обновлены
+    _status->setResetMess(true);
     return true;
 }
 
@@ -70,10 +71,10 @@ bool HandlerMessage52::handle(const std::shared_ptr<Message>& message) {
     friendD.login = m52->login_name_friend.first;
     friendD.name = m52->login_name_friend.second;
     _status->setFriendOpenChatP(std::move(friendD));
-    
+    // флаг что сообщения обновлены
+    _status->setResetMess(true);
     return true;
 }
-
 
 
 
@@ -89,12 +90,6 @@ bool HandlerMessage53::handle(const std::shared_ptr<Message>& message) {
     _status->setListChatP(std::move(m53->list_chat_P));
     return true;
 }
-
-
-
-
-
-
 
 
 // Обработка для Message53 (получить список всех юзеров в чате кому написать)

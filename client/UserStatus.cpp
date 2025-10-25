@@ -226,6 +226,15 @@ void UserStatus::setChatOpen(chat chatOpen){
   //this->resetUI(); // обновление и так будет при принятом сообщении
 }
 
+// Сообщения обновлены?
+bool UserStatus::getResetMess() const{
+    return _resetMess.load(std::memory_order_acquire);
+}
+    // Сообщения обновлены?
+void UserStatus::setResetMess(bool resetMess){
+    _resetMess.store(resetMess, std::memory_order_release);
+}
+
 //##################################################
 //#################### СПИСКИ ####################
 //##################################################

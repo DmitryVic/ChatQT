@@ -78,6 +78,9 @@ private:
     chat _chatOpen = SHARED_CHAT;
     mutable std::mutex _chatOpenMutex;
 
+    // Сообщения обновлены?
+    std::atomic<bool> _resetMess {false};
+
     //#################### СПИСКИ ####################
     
     //pair<us.login, us.name>
@@ -180,6 +183,11 @@ public:
 
     chat getChatOpen() const;
     void setChatOpen(chat chatOpen);
+
+    // Сообщения обновлены?
+    bool getResetMess() const;
+     // Сообщения обновлены?
+    void setResetMess(bool resetMess);
 
     //#################### СПИСКИ ####################
     

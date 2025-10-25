@@ -15,6 +15,8 @@
 #include <QPointer>
 #include <QTimer>
 #include <QScrollBar>
+#include <thread>
+#include <chrono>
 
 
 MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
@@ -56,7 +58,7 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
 
        // Таймер для отправки запросов на обновление списков
        QTimer* timer_list = new QTimer(this);
-       timer_list->setInterval(2000);
+       timer_list->setInterval(2000); // обновление каждые 2 секунды
        connect(timer_list, &QTimer::timeout, this, [this]() {
               if (_userStatus->getNetworckConnect())
               {
@@ -130,12 +132,13 @@ void MainWindow::setUserStatus(std::shared_ptr<UserStatus> userStatus){
 
  // обновление от UserStatus
 void MainWindow::resetMainWind(){
-       resetMessagesArea();
        resetChatListArea();
        resetNotifi();
-       // скроллим вниз область сообщений
-       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
-       vScrollBar->setValue(vScrollBar->maximum());
+       if (_userStatus->getResetMess())
+       {
+              resetMessagesArea();
+              _userStatus->setResetMess(false); // сброс флага после обновления
+       }
 }
 
 void MainWindow::resetNotifi(){
@@ -249,7 +252,7 @@ void MainWindow::resetMessagesArea() {
               scrollLayoutMessages->addWidget(messageWidget);
        }
 
-              // Добавляем растягивающийся элемент в конец
+       // Добавляем растягивающийся элемент в конец
        scrollLayoutMessages->addStretch();
 
        std::string chatName = _userStatus->getChatName();
@@ -267,6 +270,7 @@ void MainWindow::resetMessagesArea() {
        QStandardItem *item = new QStandardItem(QString::fromStdString(chatName));
        item->setEditable(false); // обычно заголовки не редактируемы
        model->appendRow(item);
+
 }
 
 
@@ -388,6 +392,11 @@ void MainWindow::resetChatListArea()
 
        // Добавляем растягивающий элемент, чтобы кнопки прижимались вверх
        scrollLayout->addStretch();
+
+       // скроллим вниз область сообщений
+       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
+       vScrollBar->setValue(vScrollBar->maximum());
+       
 }
 
 
