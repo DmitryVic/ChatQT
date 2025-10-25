@@ -1,4 +1,4 @@
-# Рефакторинг проектов [Chat](https://github.com/DmitryVic/Chat-make-build), [Chat](https://github.com/DmitryVic/Chat-HW-Project), внедрение БД MySQL
+# Итоговый проект по разработке кроссплатформенного приложения чата на C++ с использованием MySQL и Qt
 
 **Студент** - Зайкин Дмитрий
 **Группа** - CPLUS-68
@@ -72,11 +72,20 @@ mysql -u chat_user -p -h 127.0.0.1
 ## Установка дополнительных библиотек
 
 ### Выполнить установку библиотеки JSON `json.hpp`
-Для ОС: Linux Ubuntu/Debian:
+**Для ОС: Linux Ubuntu/Debian:**
 ```bash
 sudo apt-get update
 sudo apt-get install nlohmann-json3-dev
 ```
+
+**Для ОС: Windows MinGW:**
+
+Установка через vcpkg
+```bash
+# Установка через vcpkg
+vcpkg install nlohmann-json:x64-mingw-dynamic
+```
+
 
 ❗**Важно**: унификация версий JSON для сетевого взаимодействия:
 
@@ -110,9 +119,32 @@ sudo apt-get install pkg-config
 ls /usr/include/mysql/ | grep "mysql.h"
 ls /usr/lib/x86_64-linux-gnu | grep "libmysqlclient.so"
 ```
+
+### Выполнить установку `QT`
+
+#### `QT` Linux (Ubuntu/Debian)
+```bash
+sudo apt update
+sudo apt install qt6-base-dev qt6-tools-dev qt6-multimedia-dev cmake
+```
+#### `QT` Windows MinGW
+
+**Способ 1: Установка через официальный установщик** [QT](https://www.qt.io/download-qt-installer)
+- Скачать и установить Qt
+- При установке выбрать Qt 6.x.x MinGW 64-bit
+- После установки убедитесь, что путь к qmake.exe добавлен в PATH
+
+**Способ 2: Установка QT для MinGW **
+Запустите терминал MSYS2 MinGW64:
+```bash
+pacman -Syu
+pacman -S mingw-w64-x86_64-qt6-base mingw-w64-x86_64-qt6-tools mingw-w64-x86_64-qt6-multimedia
+```
+
+
 ## Настройка IP адресса
 
-Взаимодействие программ осуществляется по сети (TCP). IP адресс сервера задается в обьекте `network` класса `NetworkClient` файл `main.cpp` клиенской части (`/client/src/main.cpp`).
+Взаимодействие программ осуществляется по сети (TCP). IP адресс сервера задается в обьекте `network` класса `NetworkClient` файл `main.cpp` клиенской части.
 
 # Сборка и компиляция проекта CMake
 
