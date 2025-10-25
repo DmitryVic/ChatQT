@@ -65,11 +65,30 @@ public:
         bool load_Chat_H(std::vector<MessageStruct>& out) override;
 
         /*=====================================
+                ПОЛЯ BAN / DISCON
+        =====================================*/
+
+        // Проверка ban по логину. Возвращает флаг ошибки: true — была ошибка, false — успешно.
+        // Результат поля ban возвращается через isBanned по ссылке.
+        bool checkBanByLogin(const std::string& login, bool& isBanned);
+
+        // Установка ban по логину. Возвращает флаг ошибки: true — была ошибка (например пользователь не найден или ошибка БД), false — успешно.
+        bool setBanByLogin(const std::string& login, bool banValue);
+
+        // Проверка discon по логину. Возвращает флаг ошибки: true — была ошибка, false — успешно.
+        // Результат поля discon возвращается через isDiscon по ссылке.
+        bool checkDisconByLogin(const std::string& login, bool& isDiscon);
+        // Установка discon по логину. Возвращает флаг ошибки: true — была ошибка (например пользователь не найден или ошибка БД), false — успешно.
+        bool setDisconByLogin(const std::string& login, bool disconValue);
+
+        /*=====================================
                 ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
         =====================================*/
 
         //Экранирование
         std::string escapeString(const std::string& str);
+
+
 
 };
 

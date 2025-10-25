@@ -32,7 +32,42 @@ bool HandlerMessage1::handle(const std::shared_ptr<Message>& message) {
     // Логика обработки
     std::shared_ptr<User> user = currentUser.db->search_User(m1->login);
 
+    // Проверка на существование пользователя и правильность пароля
     bool authSuccess = user && (hashToString(sha1(m1->pass)) == user->getPass());
+    
+    // Если аутентификация успешна, проверяем бан
+    if (authSuccess) {
+        bool isBanned = false;
+        if (currentUser.db->checkBanByLogin(m1->login, isBanned)) {
+            // Ошибка проверки бана
+            Message50 response;
+            response.status_request = false;
+            json j;
+            response.to_json(j);
+            _network->sendMess(j.dump());
+            throw std::runtime_error("HandlerMessage1: Ошибка проверки бана");
+        }
+        if (isBanned) {
+            // Пользователь забанен
+            Message50 response;
+            response.status_request = false;
+            json j;
+            response.to_json(j);
+            _network->sendMess(j.dump());
+            throw std::runtime_error("HandlerMessage1: Закрываю соединение... БАН");
+        }
+        
+        // Если не забанен, снимаем флаг discon
+        if (currentUser.db->setDisconByLogin(m1->login, false)) {
+            // Ошибка снятия discon
+            Message50 response;
+            response.status_request = false;
+            json j;
+            response.to_json(j);
+            _network->sendMess(j.dump());
+            throw std::runtime_error("HandlerMessage1: Ошибка снятия флага discon");
+        }
+    }
     
     // Формируем ответ
     Message56 response;
@@ -107,6 +142,46 @@ bool HandlerMessage3::handle(const std::shared_ptr<Message>& message){
     std::shared_ptr<User> user_sender = currentUser.db->search_User(m3->user_sender);
     std::shared_ptr<User> user_recipient = currentUser.db->search_User(m3->user_recipient);
     
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage3: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage3: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage3: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage3: Закрываю соединение... Разлогирован");
+    }
+    
     if (user_sender == nullptr || user_recipient == nullptr)
     {
         get_logger() << "Ошибка БД - HandlerMessage3::handle";
@@ -162,6 +237,46 @@ bool HandlerMessage4::handle(const std::shared_ptr<Message>& message){
     auto m4 = std::dynamic_pointer_cast<Message4>(message);
     std::shared_ptr<User> user_sender = currentUser.db->search_User(m4->login_user_sender);
     
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage4: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage4: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage4: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage4: Закрываю соединение... Разлогирован");
+    }
+    
     if (user_sender == nullptr)
     {
         get_logger() << "Error: Не верные данные авторизации авторизованного юзера (сообщение 4)";
@@ -208,6 +323,47 @@ bool HandlerMessage5::handle(const std::shared_ptr<Message>& message){
     }
 
     auto m5 = std::dynamic_pointer_cast<Message5>(message);
+    
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage5: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage5: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage5: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage5: Закрываю соединение... Разлогирован");
+    }
+    
     //получаем пользователя и проверяем на nullptr
     std::shared_ptr<User> user_sender = currentUser.db->search_User(m5->my_login);
 
@@ -247,6 +403,46 @@ bool HandlerMessage6::handle(const std::shared_ptr<Message>& message){
     }
 
     auto m6 = std::dynamic_pointer_cast<Message6>(message);
+    
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage6: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage6: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage6: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage6: Закрываю соединение... Разлогирован");
+    }
 
     std::shared_ptr<User> user_sender = currentUser.db->search_User(m6->my_login);
     
@@ -285,6 +481,47 @@ bool HandlerMessage7::handle(const std::shared_ptr<Message>& message){
     }
 
     auto m7 = std::dynamic_pointer_cast<Message7>(message);
+    
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage7: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage7: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage7: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage7: Закрываю соединение... Разлогирован");
+    }
+    
     //получаем пользователя и проверяем на nullptr
     std::shared_ptr<User> user = currentUser.db->search_User(m7->my_login);
 
@@ -319,6 +556,47 @@ bool HandlerMessage8::handle(const std::shared_ptr<Message>& message){
     }
     
     auto m8 = std::dynamic_pointer_cast<Message8>(message);
+    
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage8: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage8: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage8: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage8: Закрываю соединение... Разлогирован");
+    }
+    
     std::shared_ptr<User> user_sender = currentUser.db->search_User(m8->user_sender);
     std::shared_ptr<User> user_recipient = currentUser.db->search_User(m8->user_recipient);
     
@@ -374,6 +652,47 @@ bool HandlerMessage9::handle(const std::shared_ptr<Message>& message){
     }
 
     auto m9 = std::dynamic_pointer_cast<Message9>(message);
+    
+    // Проверка на бан и discon
+    bool isBanned = false;
+    bool isDiscon = false;
+    
+    // Проверяем бан
+    if (currentUser.db->checkBanByLogin(currentUser.online_user_login, isBanned)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage9: Ошибка проверки бана");
+    }
+    if (isBanned) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage9: Закрываю соединение... БАН");
+    }
+    
+    // Проверяем discon
+    if (currentUser.db->checkDisconByLogin(currentUser.online_user_login, isDiscon)) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage9: Ошибка проверки discon");
+    }
+    if (isDiscon) {
+        Message50 response;
+        response.status_request = false;
+        json j;
+        response.to_json(j);
+        _network->sendMess(j.dump());
+        throw std::runtime_error("HandlerMessage9: Закрываю соединение... Разлогирован");
+    }
+    
     std::shared_ptr<User> user_sender = currentUser.db->search_User(m9->user_sender);
     
     if (user_sender == nullptr)

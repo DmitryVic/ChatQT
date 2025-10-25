@@ -55,6 +55,21 @@ public:
         // Загрузить историю общего чата: пары <login, сообщение>
         virtual bool load_Chat_H(std::vector<MessageStruct>& out) = 0;
 
+        /*=====================================
+                ПОЛЯ BAN / DISCON
+        =====================================*/
+
+        // Проверка ban по логину. Возвращает флаг ошибки: true — была ошибка, false — успешно.
+        // Результат поля ban возвращается через isBanned по ссылке.
+        virtual bool checkBanByLogin(const std::string& login, bool& isBanned) = 0;
+
+        // Установка ban по логину. Возвращает флаг ошибки: true — была ошибка, false — успешно.
+        virtual bool setBanByLogin(const std::string& login, bool banValue) = 0;
+
+        // Аналогично для discon
+        virtual bool checkDisconByLogin(const std::string& login, bool& isDiscon) = 0;
+        virtual bool setDisconByLogin(const std::string& login, bool disconValue) = 0;
+
 };
 
 

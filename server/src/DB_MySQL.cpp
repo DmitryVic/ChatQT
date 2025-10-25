@@ -559,3 +559,152 @@ std::string DataBaseMySQL::escapeString(const std::string& str) {
 	delete[] escaped;
 	return result;
 }
+
+
+/*=====================================
+        РАБОТА С ПОЛЯМИ ban / discon
+=====================================*/
+
+bool DataBaseMySQL::checkBanByLogin(const std::string& login, bool& isBanned) {
+    isBanned = false;
+
+    std::string request = "SELECT ban FROM users WHERE login = '" + escapeString(login) + "' LIMIT 1;";
+    if (mysql_query(&sql_mysql, request.c_str()) != 0) {
+        get_logger() << "Ошибка БД (MySQL) checkBanByLogin: " << mysql_error(&sql_mysql);
+        return true; // ошибка
+    }
+
+    MYSQL_RES* res = mysql_store_result(&sql_mysql);
+    if (!res) {
+        if (mysql_errno(&sql_mysql)) {
+            get_logger() << "Ошибка получения результата checkBanByLogin: " << mysql_error(&sql_mysql);
+            return true;
+        }
+        // нет результатов — считаем ошибкой (пользователь не найден)
+        return true;
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(res);
+    if (!row) {
+        mysql_free_result(res);
+        return true; // пользователь не найден
+    }
+
+    // row[0] может быть "0" или "1" или NULL
+    if (row[0]) {
+        std::string val = row[0];
+        isBanned = (val == "1" || val == "true");
+    } else {
+        isBanned = false;
+    }
+
+    mysql_free_result(res);
+    return false; // без ошибки
+}
+
+bool DataBaseMySQL::setBanByLogin(const std::string& login, bool banValue) {
+    std::string request = "UPDATE users SET ban = " + std::to_string(banValue ? 1 : 0) + " WHERE login = '" + escapeString(login) + "' ;";
+    if (mysql_query(&sql_mysql, request.c_str()) != 0) {
+        get_logger() << "Ошибка БД (MySQL) setBanByLogin: " << mysql_error(&sql_mysql);
+        return true; // ошибка выполнения запроса
+    }
+
+    my_ulonglong affected = mysql_affected_rows(&sql_mysql);
+    if (affected == 0) {
+        // ДОПОЛНИТЕЛЬНО Возможно, строка не найдена или значение не изменилось. Проверим существование пользователя
+        std::string check = "SELECT id FROM users WHERE login = '" + escapeString(login) + "' LIMIT 1;";
+        if (mysql_query(&sql_mysql, check.c_str()) != 0) {
+            get_logger() << "Ошибка БД (MySQL) setBanByLogin (проверка существования): " << mysql_error(&sql_mysql);
+            return true;
+        }
+        MYSQL_RES* res = mysql_store_result(&sql_mysql);
+        if (!res) {
+            // ошибка выполнения запроса или нет результатов
+            if (mysql_errno(&sql_mysql)) {
+                get_logger() << "Ошибка БД (MySQL) setBanByLogin (store_result): " << mysql_error(&sql_mysql);
+                return true;
+            }
+            return true; // нет результатов
+        }
+        MYSQL_ROW row = mysql_fetch_row(res);
+        mysql_free_result(res);
+        if (!row) {
+            // пользователь не найден
+            return true;
+        }
+        // пользователь существует, но affected_rows == 0 (значение могло не измениться) — считаем успешно
+    }
+
+    return false; // успешно
+}
+
+bool DataBaseMySQL::checkDisconByLogin(const std::string& login, bool& isDiscon) {
+    isDiscon = false;
+
+    std::string request = "SELECT discon FROM users WHERE login = '" + escapeString(login) + "' LIMIT 1;";
+    if (mysql_query(&sql_mysql, request.c_str()) != 0) {
+        get_logger() << "Ошибка БД (MySQL) checkDisconByLogin: " << mysql_error(&sql_mysql);
+        return true; // ошибка
+    }
+
+    MYSQL_RES* res = mysql_store_result(&sql_mysql);
+    if (!res) {
+        if (mysql_errno(&sql_mysql)) {
+            get_logger() << "Ошибка получения результата checkDisconByLogin: " << mysql_error(&sql_mysql);
+            return true;
+        }
+        // нет результатов — считаем ошибкой (пользователь не найден)
+        return true;
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(res);
+    if (!row) {
+        mysql_free_result(res);
+        return true; // пользователь не найден
+    }
+
+    if (row[0]) {
+        std::string val = row[0];
+        isDiscon = (val == "1" || val == "true");
+    } else {
+        isDiscon = false;
+    }
+
+    mysql_free_result(res);
+    return false; // без ошибки
+}
+
+bool DataBaseMySQL::setDisconByLogin(const std::string& login, bool disconValue) {
+    std::string request = "UPDATE users SET discon = " + std::to_string(disconValue ? 1 : 0) + " WHERE login = '" + escapeString(login) + "' ;";
+    if (mysql_query(&sql_mysql, request.c_str()) != 0) {
+        get_logger() << "Ошибка БД (MySQL) setDisconByLogin: " << mysql_error(&sql_mysql);
+        return true; // ошибка выполнения запроса
+    }
+
+    my_ulonglong affected = mysql_affected_rows(&sql_mysql);
+    if (affected == 0) {
+        // Возможно, строка не найдена или значение не изменилось. Проверим существование пользователя.
+        std::string check = "SELECT id FROM users WHERE login = '" + escapeString(login) + "' LIMIT 1;";
+        if (mysql_query(&sql_mysql, check.c_str()) != 0) {
+            get_logger() << "Ошибка БД (MySQL) setDisconByLogin (проверка существования): " << mysql_error(&sql_mysql);
+            return true;
+        }
+        MYSQL_RES* res = mysql_store_result(&sql_mysql);
+        if (!res) {
+            if (mysql_errno(&sql_mysql)) {
+                get_logger() << "Ошибка БД (MySQL) setDisconByLogin (store_result): " << mysql_error(&sql_mysql);
+                return true;
+            }
+            return true;
+        }
+        MYSQL_ROW row = mysql_fetch_row(res);
+        mysql_free_result(res);
+        if (!row) {
+            // пользователь не найден
+            return true;
+        }
+        // пользователь существует, affected_rows == 0 -> значение прежнее, считаем успешно
+    }
+
+    return false; // успешно
+}
