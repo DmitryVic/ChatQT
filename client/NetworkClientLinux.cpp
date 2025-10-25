@@ -33,6 +33,7 @@ void NetworkClient::startThreads() {
     recvThread = std::thread(&NetworkClient::recvLoop, this);
     sendThread = std::thread(&NetworkClient::sendLoop, this);
     status->setNetworckThreadsSost(true);
+    std::cerr << "Потоки запущены" << std::endl;
 }
 
 // Остановка потоков приёма и отправки
@@ -42,6 +43,7 @@ void NetworkClient::stopThreads() {
     if (recvThread.joinable()) recvThread.join();
     if (sendThread.joinable()) sendThread.join();
     status->setNetworckThreadsSost(false);
+    std::cerr << "Потоки остановлены" << std::endl;
 }
 
 // Функция для потока приёма
@@ -168,30 +170,6 @@ void NetworkClient::sendMess(const std::string& message) {
         // throw std::runtime_error("Ошибка отправки");
     }
 }
-
-// // ПОЛУЧЕНИЕ СООБЩЕНИЯ
-// std::string NetworkClient::getMess() {
-//     char buffer[991024] = {0};  // Буфер для приема данных 2 МБ - 106128 символов
-//     // recv() читает данные из сокета
-//     // sizeof(buffer) - максимальный размер данных для чтения
-//     int bytes_read = recv(sock, buffer, sizeof(buffer), 0);
-//     if (bytes_read < 0){
-//         throw std::runtime_error("Ошибка чтения");
-//     } 
-        
-//     if (bytes_read == 0) {
-//         std::cerr << "getMess | Сервер закрыл соединение\n";
-// 		status->setNetworckConnect(false);
-//         return "";  // Возвращаем пустую строку
-//         // throw std::runtime_error("Сервер закрыл соединение");
-//         // если соединение оборвано,, то getMess будет постоянно отдавать ""
-//         // НУЖНО ДОБАВИТЬ ОСТАНОВКУ И ПЕРЕПРОВЕРКУ В ЦИКЛЕ 
-//     }
-//     // Важно! Создаем строку с указанием длины (bytes_read)
-//     // чтобы корректно обработать данные с нулевыми байтами
-//     return std::string(buffer, bytes_read);
-// }
-
 
 
 std::string NetworkClient::getMess() {

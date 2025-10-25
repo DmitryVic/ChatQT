@@ -97,7 +97,7 @@ int main (int argc, char *argv[])
               std::string json_str = userStatus->waitAndPopAcceptedMessage();
               
               if(json_str == "") {
-                  cout << "Пусто\n";
+                  userStatus->setNotifi("core | Пустое сообщение");
                   break;
               }
 
@@ -106,18 +106,14 @@ int main (int argc, char *argv[])
               if (!msg)
               {
                   userStatus->setNetworckConnect(false);
-                  // throw  std::runtime_error("Ошибка в полученых данных");
-                  std::cerr << "core | Ошибка в полученых данных\n";
+                  userStatus->setNotifi("core | Ошибка в полученых данных | Нет сообщения");
               }
               
               if (!Handler50->handle(msg)){
-                  // userStatus->setNetworckConnect(false);
-                  std::cerr << "core | Ошибка в обработке данных\n";
-                  // throw  std::runtime_error("Ошибка в обработке данных, закрываю соединение...");
+                  userStatus->setNotifi("core | Ошибка в обработке данных | Handler");
               }
           }
           
-          std::cerr << "Запускаю инициализацию сети\n";
           userStatus->setNotifi("Запускаю инициализацию сети");
           
           if (userStatus->running())
@@ -131,27 +127,23 @@ int main (int argc, char *argv[])
                   std::this_thread::sleep_for(std::chrono::seconds(1));
                   std::string notify = "Network reconnect: " + std::to_string(i) + " sec";
                   userStatus->setNotifi(notify);
-                  std::cerr << "Network reconnect: "  << i  << " sec\n";
               }
 
               if (userStatus->getNetworckThreadsSost()){
-                  std::cerr << "Повторно останавливаю потоки сети\n";
                   userStatus->setNotifi("Повторно останавливаю потоки сети");
               }
               else
               {
-                  std::cerr << "Подключение сети\n"; 
                   userStatus->setNotifi("Подключение сети");
                   network->connecting();
                   std::this_thread::sleep_for(std::chrono::seconds(1));
-                  std::cerr << "Запуск потоков\n";
                   userStatus->setNotifi("Запуск потоков");    
                   network->startThreads();
               }
           }
           else
           {
-              std::cerr << "Остановка Потоков userStatus->running() OFF\n";    
+              userStatus->setNotifi("Остановка Потоков");
               network->stopThreads();
           }   
       }
@@ -193,6 +185,7 @@ int main (int argc, char *argv[])
     {
       // Пользователь не вошел - завершаем приложение
       std::cerr << "Пользователь не вошел - завершаем приложение\n";
+      userStatus->stopApp();
       if (network) network->stopThreads();
       if (userStatus) userStatus->stopApp();
 
@@ -204,6 +197,7 @@ int main (int argc, char *argv[])
   //Запуск UI
   int exitCode = a.exec();
   
+  userStatus->stopApp();
   // Остановка приложения
   if (network) network->stopThreads();
   if (userStatus) userStatus->stopApp();

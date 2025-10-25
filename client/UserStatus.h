@@ -99,6 +99,9 @@ private:
 
     //Логин занят
     std::atomic<bool> _loginBusy = false;
+
+    //Ответ от сетвера получен
+     std::atomic<bool> _serverResponseReg = false;
     
 public:
     UserStatus();
@@ -209,6 +212,11 @@ public:
     bool getLoginBusy() const;
     //изменить статус флага логин занят
     void setLoginBusy(bool loginBusy);
+
+    //Ответ от сетвера получен
+    bool getServerResponseReg() const;
+    //Ответ от сетвера получен
+    void setServerResponseReg(bool serverResponse);
 
 };
 

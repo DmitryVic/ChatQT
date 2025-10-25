@@ -119,6 +119,7 @@ bool HandlerMessage55::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
+    _status->setServerResponseReg(true); // Ответ пришел
     _status->setLoginBusy(true);
     return true;
 }
@@ -133,9 +134,17 @@ bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m56 = std::dynamic_pointer_cast<Message56>(message);
-    _status->setAuthorizationStatus(true);
-    User us(m56->my_login, "", m56->my_name);
-    _status->setUser(us);
+    _status->setServerResponseReg(true); // Ответ пришел
+    if (m56->authorization)
+    {
+        _status->setAuthorizationStatus(true);
+        User us(m56->my_login, "", m56->my_name);
+        _status->setUser(us);
+    }
+    else
+    {
+        _status->setAuthorizationStatus(false);
+    } 
     return true;
 }
 

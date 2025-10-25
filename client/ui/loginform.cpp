@@ -51,7 +51,7 @@ void LoginForm::on_buttonBox_accepted()
       std::cerr << "Error creating/sending message: " << e.what() << std::endl;
       return;
   }
-  std::cerr << "Ожидаем ответ сервера по регистрации...\n";
+  ui->serverAnswer->setText("🕐 Ожидаем ответ сервера... (2 сек)");
   
   int attempts = 0;
   while (true)
@@ -59,7 +59,7 @@ void LoginForm::on_buttonBox_accepted()
     attempts++;
     if (attempts > 20) // таймаут 20 попыток (~2 секунды)
     {
-      std::cerr << "Превышено время ожидания ответа от сервера по регистрации.\n";
+      ui->serverAnswer->setText("⚠️ Превышено время ожидания ответа от сервера по авторизации ");
       QMessageBox::critical(this,
                             tr("Error"),
                             tr("Timeout waiting for server response"));
@@ -67,22 +67,35 @@ void LoginForm::on_buttonBox_accepted()
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy())
+    if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
     {
-      std::cerr << "Регистрация успешна.\n";
+      ui->serverAnswer->setText("✅ Регистрация успешна");
+      std::cerr << "_userStatus->getAuthorizationStatus(): " << _userStatus->getAuthorizationStatus() << "\n";
+      _userStatus->setServerResponseReg(false); // сбрасываем флаг
        // уведомляем о успешной регистрации
        emit accepted();
       return;
     }
-    else if(_userStatus->getLoginBusy())
+    else if(_userStatus->getLoginBusy() && _userStatus->getServerResponseReg()) // маловероятно, для надежности
     {
-      std::cerr << "Логин занят, регистрация не удалась.\n";
+      ui->serverAnswer->setText("⚠️ Логин занят");
       QMessageBox::critical(this,
                             tr("Error"),
                             tr("Login is busy"));
       _userStatus->setLoginBusy(false); // сбрасываем флаг
+      _userStatus->setServerResponseReg(false); // сбрасываем флаг
       return;
     }
+    else if(_userStatus->getServerResponseReg() && !_userStatus->getAuthorizationStatus()) // пришел ответ с false
+    {
+      ui->serverAnswer->setText("⚠️ Не верный логин или пароль");
+      QMessageBox::critical(this,
+                            tr("Error"),
+                            tr("Error login or pass"));
+      _userStatus->setServerResponseReg(false); // сбрасываем флаг
+      return;
+    }
+    
   }
  
 }

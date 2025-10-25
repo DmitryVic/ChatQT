@@ -42,7 +42,7 @@ void RegistrationForm::on_buttonBox_accepted()
   mess2.to_json(j2);
   _userStatus->pushMessageToSend(j2.dump());
 
-  std::cerr << "Ожидаем ответ сервера по регистрации...\n";
+  ui->serwAnswer->setText("🕐 Ожидаем ответ сервера ... (2 сек)");
   
   int attempts = 0;
   while (true)
@@ -50,7 +50,7 @@ void RegistrationForm::on_buttonBox_accepted()
     attempts++;
     if (attempts > 20) // таймаут 20 попыток (~2 секунды)
     {
-      std::cerr << "Превышено время ожидания ответа от сервера по регистрации.\n";
+      ui->serwAnswer->setText("⚠️ Превышено время ожидания ответа от сервера по регистрации ");
       QMessageBox::critical(this,
                             tr("Error"),
                             tr("Timeout waiting for server response"));
@@ -58,18 +58,29 @@ void RegistrationForm::on_buttonBox_accepted()
     }
     
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy())
+    if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
     {
-      std::cerr << "Регистрация успешна.\n";
+      std::cerr << "✅ Регистрация успешна";
+      _userStatus->setServerResponseReg(false); // сбрасываем флаг
       emit accepted(); // уведомляем о успешной регистрации
       return;
     }
-    else if(_userStatus->getLoginBusy())
+    else if(_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
     {
-      std::cerr << "Логин занят, регистрация не удалась.\n";
+      ui->serwAnswer->setText("⚠️ Логин занят");
       QMessageBox::critical(this,
                             tr("Error"),
                             tr("Login is busy"));
+      _userStatus->setLoginBusy(false); // Сбрасываем флаг
+      _userStatus->setServerResponseReg(false); // сбрасываем флаг
+      return;
+    }
+    else if(!_userStatus->getAuthorizationStatus() && _userStatus->getServerResponseReg()){ //Ошибочные данные, регистрация не прошла
+      ui->serwAnswer->setText("⚠️ Ошибка данных для регистрации");
+      QMessageBox::critical(this,
+                            tr("Error"),
+                            tr("Data error"));
+      _userStatus->setServerResponseReg(false); // сбрасываем флаг
       return;
     }
   }

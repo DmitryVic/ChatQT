@@ -1,5 +1,6 @@
 #include "startscreen.h"
 #include "./ui_startscreen.h"
+#include <QTimer>
 
 StartScreen::StartScreen(QWidget *parent, std::shared_ptr<UserStatus> userStatus) :
   QDialog(parent), _userStatus(userStatus), ui(new Ui::StartScreen)
@@ -17,6 +18,20 @@ StartScreen::StartScreen(QWidget *parent, std::shared_ptr<UserStatus> userStatus
   connect(ui->registerWidget, &RegistrationForm::accepted, this, &StartScreen::onLoggedIn);
   connect(ui->registerWidget, &RegistrationForm::rejected, this, &StartScreen::onRejectRequested);
 
+  // Таймер отображения статуса сети
+  QTimer* timer = new QTimer(this);
+  timer->setInterval(200);
+  connect(timer, &QTimer::timeout, this, [this, userStatus]() {
+  if (userStatus->getNetworckConnect())
+  {
+    ui->networckLabel->setText("✅ Подключены к серверу");
+  }
+  else
+  {
+    ui->networckLabel->setText("❗ Отсутствует подключение к серверу");
+  }
+  });
+  timer->start();
 }
 
 StartScreen::~StartScreen()

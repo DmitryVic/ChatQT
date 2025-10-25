@@ -27,7 +27,7 @@ void NetworkClient::startThreads() {
 	recvThread = std::thread(&NetworkClient::recvLoop, this);
 	sendThread = std::thread(&NetworkClient::sendLoop, this);
         status->setNetworckThreadsSost(true);
-    std::cerr << "Потоки запущены!!!!!!!!" << std::endl;
+    std::cerr << "Потоки запущены" << std::endl;
 }
 
 // Остановка потоков приёма и отправки
@@ -37,7 +37,7 @@ void NetworkClient::stopThreads() {
 	if (recvThread.joinable()) recvThread.join();
 	if (sendThread.joinable()) sendThread.join();
         status->setNetworckThreadsSost(false);
-    std::cerr << "Потоки остановлены!!!!!!!!" << std::endl;
+    std::cerr << "Потоки остановлены" << std::endl;
 }
 
 // Функция для потока приёма
@@ -70,7 +70,7 @@ void NetworkClient::recvLoop() {
                 // НУЖНО ДОБАВИТЬ ОСТАНОВКУ И ПЕРЕПРОВЕРКУ В ЦИКЛЕ 
 
 				if (!msg.empty()) {
-                                        status->pushAcceptedMessage(msg);
+                    status->pushAcceptedMessage(msg);
 				}
 			} catch (const std::exception& e) {
 				std::cerr << "Ошибка приёма: " << e.what() << std::endl;
@@ -223,27 +223,6 @@ void NetworkClient::sendMess(const std::string& message) {
 	}
 }
 
-
-// ПОЛУЧЕНИЕ СООБЩЕНИЯ
-
-// СТАРЫЙ ВАРИАНТ getMess
-/*
-std::string NetworkClient::getMess() {
-    char buffer[1024] = {0};
-    int bytes_read = recv(sock, buffer, sizeof(buffer), 0);
-
-    if (bytes_read == SOCKET_ERROR) throw std::runtime_error("Ошибка чтения");
-    if (bytes_read == 0) {
-        std::cerr << "getMess | Сервер закрыл соединение\n";
-        status->setNetworckConnect(false);
-        // throw std::runtime_error("Сервер закрыл соединение");
-        // если соединение оборвано,, то getMess будет постоянно отдавать ""
-        // НУЖНО ДОБАВИТЬ ОСТАНОВКУ И ПЕРЕПРОВЕРКУ В ЦИКЛЕ 
-    }
-
-    return std::string(buffer, bytes_read);
-}
-*/
 
 // Новый вариант getMess с поддержкой буфера и извлечения одного JSON-сообщения (адаптация с Linux)
 std::string NetworkClient::getMess() {

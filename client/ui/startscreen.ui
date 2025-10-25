@@ -23,6 +23,13 @@
      <widget class="RegistrationForm" name="registerWidget"/>
     </widget>
    </item>
+   <item>
+    <widget class="QLabel" name="networckLabel">
+     <property name="text">
+      <string>Состояние сети</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

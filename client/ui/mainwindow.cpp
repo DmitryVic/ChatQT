@@ -328,7 +328,7 @@ void MainWindow::resetChatListArea()
        }
 
        //ДОБАВЛЯЕМ ПОЛЬЗОВАТЕЛЕЙ
-        std::vector<std::pair<std::string, std::string>> listUsers = _userStatus->getListUsers(); // Загружаем список пользователей из UserStatus pair<us.login, us.name>
+       std::vector<std::pair<std::string, std::string>> listUsers = _userStatus->getListUsers(); // Загружаем список пользователей из UserStatus pair<us.login, us.name>
        for (const auto& user : listUsers) {
               const std::string& userLogin = user.first;
               const std::string& userName = user.second;

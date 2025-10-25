@@ -277,34 +277,42 @@ void UserStatus::setNotifi(std::string notifi){
 // Данные пользователя - АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ
 //##################################################
 
-    void UserStatus::setUser(User user){
-        std::lock_guard<std::mutex> lock(_myUserMutex);
-        this->myUser = user;
-    }
+void UserStatus::setUser(User user){
+    std::lock_guard<std::mutex> lock(_myUserMutex);
+    this->myUser = user;
+}
 
-    User UserStatus::getUser() const{
-        std::lock_guard<std::mutex> lock(_myUserMutex);
-        return this->myUser;
-    }
+User UserStatus::getUser() const{
+    std::lock_guard<std::mutex> lock(_myUserMutex);
+    return this->myUser;
+}
 
-     //получить флаг авторизации
-    bool UserStatus::getAuthorizationStatus() const{
-         return _authorizationStatus.load(std::memory_order_acquire);
-    }
+    //получить флаг авторизации
+bool UserStatus::getAuthorizationStatus() const{
+        return _authorizationStatus.load(std::memory_order_acquire);
+}
 
-    //изменить статус флага авторизация
-    void UserStatus::setAuthorizationStatus(bool authorizationStatus){
-        _authorizationStatus.store(authorizationStatus, std::memory_order_release);
-        this->resetUI();
-    }
+//изменить статус флага авторизация
+void UserStatus::setAuthorizationStatus(bool authorizationStatus){
+    _authorizationStatus.store(authorizationStatus, std::memory_order_release);
+}
 
-    //получить флаг логин занят
-    bool UserStatus::getLoginBusy() const{
-        return _loginBusy.load(std::memory_order_acquire);
-    }
+//получить флаг логин занят
+bool UserStatus::getLoginBusy() const{
+    return _loginBusy.load(std::memory_order_acquire);
+}
 
-    //изменить статус флага логин занят
-    void UserStatus::setLoginBusy(bool loginBusy){
-        _loginBusy.store(loginBusy, std::memory_order_release);
-        this->resetUI();
-    }   
+//изменить статус флага логин занят
+void UserStatus::setLoginBusy(bool loginBusy){
+    _loginBusy.store(loginBusy, std::memory_order_release);
+}   
+
+
+//Ответ от сетвера получен
+bool UserStatus::getServerResponseReg() const{
+    return _serverResponseReg.load(std::memory_order_acquire);
+}
+//Ответ от сетвера получен
+void UserStatus::setServerResponseReg(bool serverResponse){
+    _serverResponseReg.store(serverResponse, std::memory_order_release);
+}

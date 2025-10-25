@@ -19,14 +19,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.ui" line="80"/>
+        <location filename="../ui/loginform.ui" line="87"/>
         <source>Registration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/loginform.cpp" line="27"/>
         <location filename="../ui/loginform.cpp" line="64"/>
-        <location filename="../ui/loginform.cpp" line="81"/>
+        <location filename="../ui/loginform.cpp" line="83"/>
+        <location filename="../ui/loginform.cpp" line="93"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -41,8 +42,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="82"/>
+        <location filename="../ui/loginform.cpp" line="84"/>
         <source>Login is busy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/loginform.cpp" line="94"/>
+        <source>Error login or pass</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -92,14 +98,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.ui" line="94"/>
+        <location filename="../ui/registrationform.ui" line="101"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/registrationform.cpp" line="32"/>
         <location filename="../ui/registrationform.cpp" line="55"/>
-        <location filename="../ui/registrationform.cpp" line="71"/>
+        <location filename="../ui/registrationform.cpp" line="72"/>
+        <location filename="../ui/registrationform.cpp" line="81"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -114,8 +121,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="72"/>
+        <location filename="../ui/registrationform.cpp" line="73"/>
         <source>Login is busy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/registrationform.cpp" line="82"/>
+        <source>Data error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -124,6 +136,11 @@
     <message>
         <location filename="../ui/startscreen.ui" line="14"/>
         <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/startscreen.ui" line="29"/>
+        <source>Состояние сети</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
