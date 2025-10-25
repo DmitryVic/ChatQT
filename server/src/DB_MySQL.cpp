@@ -26,8 +26,8 @@ DataBaseMySQL::DataBaseMySQL()
     get_logger() << "Кодировка БД (MySQL): " << mysql_character_set_name(&sql_mysql);
 
     // Создание таблицы users
-    if (mysql_query(&sql_mysql, "CREATE TABLE IF NOT EXISTS users(id INT AUTO_INCREMENT PRIMARY KEY, login VARCHAR(30) UNIQUE NOT NULL, name VARCHAR(30), surname VARCHAR(30), email VARCHAR(50) UNIQUE);") != 0) {
-        throw "Ошибка БД (MySQL) оздания таблицы users: " + std::string(mysql_error(&sql_mysql));
+    if (mysql_query(&sql_mysql, "CREATE TABLE IF NOT EXISTS users(id INT AUTO_INCREMENT PRIMARY KEY, login VARCHAR(30) UNIQUE NOT NULL, name VARCHAR(30), surname VARCHAR(30), email VARCHAR(50) UNIQUE, ban BOOLEAN DEFAULT FALSE, discon BOOLEAN DEFAULT FALSE);") != 0) {
+        throw "Ошибка БД (MySQL) создания таблицы users: " + std::string(mysql_error(&sql_mysql));
     }
     // Создание таблицы user_passwords
     if (mysql_query(&sql_mysql, "CREATE TABLE IF NOT EXISTS user_passwords(user_id INT NOT NULL, PRIMARY KEY (user_id), FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, pass VARCHAR(255) NOT NULL);") != 0) {
