@@ -56,19 +56,29 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
        QTimer* timer_list = new QTimer(this);
        timer_list->setInterval(2000);
        connect(timer_list, &QTimer::timeout, this, [this]() {
-              // Отправка запроса о получении списка приватных чатов
-              Message5 mess5;
-              mess5.my_login = _userStatus->getUser().getLogin();
-              json j5;
-              mess5.to_json(j5);
-              _userStatus->pushMessageToSend(j5.dump());
+              if (_userStatus->getNetworckConnect())
+              {
+                     // Отправка запроса о получении списка приватных чатов
+                     Message5 mess5;
+                     mess5.my_login = _userStatus->getUser().getLogin();
+                     json j5;
+                     mess5.to_json(j5);
+                     _userStatus->pushMessageToSend(j5.dump());
 
-              // Отправка запроса о получении списока всех юзеров в чате кому написать
-              Message6 mess6;
-              mess6.my_login = _userStatus->getUser().getLogin();
-              json j6;
-              mess6.to_json(j6);
-              _userStatus->pushMessageToSend(j6.dump());
+                     // Отправка запроса о получении списока всех юзеров в чате кому написать
+                     Message6 mess6;
+                     mess6.my_login = _userStatus->getUser().getLogin();
+                     json j6;
+                     mess6.to_json(j6);
+                     _userStatus->pushMessageToSend(j6.dump());
+              }
+              else{
+              // ПРИ ПОТЕРИ СВЯЗИ ПОКА ПРОСТО ЗАКЫВАЕМ, НУЖНО ДОПИСАТЬ ЛОГИКУ ПОВТОРНОГО ЛОГИРОВАНИЯ
+              //  ПЕРЕДОВАЯ СООБЩЕНИЕ С ДАННЫМИ getUser И ЛУЧШЕ СДЕЛАТЬ ЭТО В resetMainWind СРАЗУ ПО ИЗМЕНИНЮ СТАТУСА NetworckConnect
+                     _userStatus->stopApp();
+                     this->close(); // Закрываем окно
+              }
+
        });
        timer_list->start();
 }
@@ -120,8 +130,20 @@ void MainWindow::setUserStatus(std::shared_ptr<UserStatus> userStatus){
 void MainWindow::resetMainWind(){
        resetMessagesArea();
        resetChatListArea();
+       resetNotifi();
 }
 
+void MainWindow::resetNotifi(){
+       if (_userStatus->getNetworckConnect())
+       {
+       ui->notifi->setText("🌐 Подключены к серверу");
+       }
+       else
+       {
+       ui->notifi->setText("❗ Отсутствует подключение к серверу");
+       }
+       // ui->notifi->setText(QString::fromStdString(_userStatus->getNotifi()));
+}
 
 void MainWindow::clearMessagesArea() {
     QLayout *layout = ui->scrollAreaWidgetContents->layout();

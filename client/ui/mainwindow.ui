@@ -94,9 +94,43 @@
        <number>10</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="LAYOUT_CHAT" stretch="1,10">
+       <layout class="QVBoxLayout" name="LAYOUT_CHAT" stretch="0,1,10">
         <item>
-         <widget class="QListView" name="chatName"/>
+         <widget class="QLabel" name="notifi">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListView" name="chatName">
+          <property name="font">
+           <font>
+            <pointsize>15</pointsize>
+            <kerning>false</kerning>
+           </font>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="gridSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="uniformItemSizes">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QScrollArea" name="scrollAreaMessage">
@@ -109,7 +143,7 @@
              <x>0</x>
              <y>0</y>
              <width>682</width>
-             <height>428</height>
+             <height>405</height>
             </rect>
            </property>
           </widget>

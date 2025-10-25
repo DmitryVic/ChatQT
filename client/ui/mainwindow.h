@@ -31,6 +31,8 @@ public:
   void resetChatListArea(); // обновление области списка чатов
   void clearChatListArea(); // очистка области списка чатов
 
+   void resetNotifi(); // очистка Уведомлений
+
   void resetMainWind();
   
   private slots:
