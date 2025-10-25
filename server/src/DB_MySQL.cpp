@@ -21,7 +21,8 @@ DataBaseMySQL::DataBaseMySQL()
     get_logger() << "Подключение БД (MySQL) успешно!";
 
     // Кодировка
-    mysql_set_character_set(&sql_mysql, "utf8");
+    mysql_set_character_set(&sql_mysql, "utf8mb4");
+    mysql_query(&sql_mysql, "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"); // Для корректного отображения смайлов и других символов
     get_logger() << "Кодировка БД (MySQL): " << mysql_character_set_name(&sql_mysql);
 
     // Создание таблицы users
