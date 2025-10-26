@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <thread>
 #include <chrono>
+#include "Logger.h"
 
 
 RegistrationForm::RegistrationForm(QWidget *parent, std::shared_ptr<UserStatus> userStatus) :
@@ -60,7 +61,7 @@ void RegistrationForm::on_buttonBox_accepted()
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
     {
-      std::cerr << "✅ Регистрация успешна";
+      get_logger() << "✅ Регистрация успешна";
       _userStatus->setServerResponseReg(false); // сбрасываем флаг
       emit accepted(); // уведомляем о успешной регистрации
       return;

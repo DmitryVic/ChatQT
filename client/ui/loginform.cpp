@@ -4,6 +4,7 @@
 #include "Message.h"
 #include <thread>
 #include <chrono>
+#include "Logger.h"
 
 
 LoginForm::LoginForm(QWidget *parent, std::shared_ptr<UserStatus> userStatus) :
@@ -38,17 +39,17 @@ void LoginForm::on_buttonBox_accepted()
   try {
       mess1.to_json(j1);
       std::string jsonStr = j1.dump();
-      std::cerr << "Sending JSON: " << jsonStr << std::endl;
+      get_logger() << "Sending JSON: " << jsonStr;
       if (_userStatus == nullptr)
       {
-        std::cerr << "Error: _userStatus is null\n";
+        get_logger() << "Error: _userStatus is null\n";
         return;
       }
       
       _userStatus->pushMessageToSend(jsonStr);
   }
   catch(const std::exception& e) {
-      std::cerr << "Error creating/sending message: " << e.what() << std::endl;
+      get_logger() << "Error creating/sending message: " << e.what();
       return;
   }
   ui->serverAnswer->setText("🕐 Ожидаем ответ сервера... (2 сек)");
@@ -70,7 +71,7 @@ void LoginForm::on_buttonBox_accepted()
     if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
     {
       ui->serverAnswer->setText("✅ Регистрация успешна");
-      std::cerr << "_userStatus->getAuthorizationStatus(): " << _userStatus->getAuthorizationStatus() << "\n";
+      get_logger() << "_userStatus->getAuthorizationStatus(): " << _userStatus->getAuthorizationStatus();
       _userStatus->setServerResponseReg(false); // сбрасываем флаг
        // уведомляем о успешной регистрации
        emit accepted();

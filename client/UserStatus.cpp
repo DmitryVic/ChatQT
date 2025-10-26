@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include <chrono>
 #include <iostream>
-
+#include "Logger.h"
 
 UserStatus::UserStatus() : myUser{"", "", ""} {}
 

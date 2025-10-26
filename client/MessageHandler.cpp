@@ -8,6 +8,7 @@
 #include <memory>
 #include "UserStatus.h"
 #include "MessageHandler.h"
+#include "Logger.h"
 
 bool MessageHandler::handleNext(const std::shared_ptr<Message>& message) {
     if (_next) return _next->handle(message);
@@ -146,6 +147,6 @@ bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
 // ошибка
 bool HandlerErr::handle(const std::shared_ptr<Message>& message) {
     //обрабатываем
-    std::cerr << "HandlerErr::handle: не известный тип сообщения \n" << message;
+    get_logger() << "HandlerErr::handle: не известный тип сообщения \n" << message;
     return true;
 }

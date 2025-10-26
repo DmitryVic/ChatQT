@@ -3,7 +3,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include "mainwindow.h"
-
+#include "Logger.h"
 #include "Message.h"
 #include "NetworkClient.h"
 #include <iostream>
@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
     try {
       std::locale::global(std::locale("ru_RU.UTF-8"));
     } catch (const std::exception& e) {
-      std::cerr << "Locale error: " << e.what() << std::endl;
+      get_logger() << "Locale error: " << e.what() << std::endl;
       std::locale::global(std::locale("C.UTF-8")); // Fallback
     }
     #endif
@@ -98,6 +98,7 @@ int main (int argc, char *argv[])
               
               if(json_str == "") {
                   userStatus->setNotifi("core | Пустое сообщение");
+                  get_logger() << "core | Пустое сообщение";
                   break;
               }
 
@@ -107,18 +108,21 @@ int main (int argc, char *argv[])
               {
                   userStatus->setNetworckConnect(false);
                   userStatus->setNotifi("core | Ошибка в полученых данных | Нет сообщения");
+                  get_logger() << "core | Ошибка в полученых данных | Нет сообщения";
               }
               
               if (!Handler50->handle(msg)){
                   userStatus->setNotifi("core | Ошибка в обработке данных | Handler");
+                  get_logger() << "core | Ошибка в обработке данных | Handler";
               }
           }
           
           userStatus->setNotifi("Запускаю инициализацию сети");
+          get_logger() << "Запускаю инициализацию сети";
           
           if (userStatus->running())
           {
-              std::cerr << "Остановка Потоков\n";    
+              get_logger() << "Остановка Потоков";    
               if (userStatus->getNetworckThreadsSost())
                   network->stopThreads();
 
@@ -127,23 +131,28 @@ int main (int argc, char *argv[])
                   std::this_thread::sleep_for(std::chrono::seconds(1));
                   std::string notify = "Network reconnect: " + std::to_string(i) + " sec";
                   userStatus->setNotifi(notify);
+                  get_logger() << notify;
               }
 
               if (userStatus->getNetworckThreadsSost()){
                   userStatus->setNotifi("Повторно останавливаю потоки сети");
+                  get_logger() << "Повторно останавливаю потоки сети";
               }
               else
               {
                   userStatus->setNotifi("Подключение сети");
+                  get_logger() << "Подключение сети";
                   network->connecting();
                   std::this_thread::sleep_for(std::chrono::seconds(1));
-                  userStatus->setNotifi("Запуск потоков");    
+                  userStatus->setNotifi("Запуск потоков");   
+                  get_logger() << "Запуск потоков";
                   network->startThreads();
               }
           }
           else
           {
               userStatus->setNotifi("Остановка Потоков");
+              get_logger() << "Остановка Потоков";
               network->stopThreads();
           }   
       }
@@ -184,7 +193,7 @@ int main (int argc, char *argv[])
   else
     {
       // Пользователь не вошел - завершаем приложение
-      std::cerr << "Пользователь не вошел - завершаем приложение\n";
+      get_logger() << "Пользователь не вошел - завершаем приложение";
       userStatus->stopApp();
       if (network) network->stopThreads();
       if (userStatus) userStatus->stopApp();

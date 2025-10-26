@@ -371,9 +371,6 @@ void MainWindow::resetChatListArea()
               chatButton->setObjectName("chat-button");
 
               connect(chatButton, &QPushButton::clicked, this, [userLogin, userName, this]() {
-              ////////////////////////////////////////////////////////////////////////////////
-              ////////// TO DO
-              ////////////////////////////////////////////////////////////////////////////////
               // запрос на получение данных приватного чата
               Message8 mess8;
               mess8.user_sender = _userStatus->getUser().getLogin();

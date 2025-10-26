@@ -6,6 +6,7 @@
 #include <ws2tcpip.h>
 #include "NetworkClient.h"
 #include "UserStatus.h"
+#include "Logger.h"
 
 
 NetworkClient::NetworkClient(const std::string& ip, int port, std::shared_ptr<UserStatus> status)
@@ -15,7 +16,7 @@ NetworkClient::~NetworkClient() {
 	stopThreads();
 	if (sock != INVALID_SOCKET) {
 		closesocket(sock);
-		std::cerr << "Соединение с сервером закрыто" << std::endl;
+		get_logger() << "Соединение с сервером закрыто";
 	}
 	WSACleanup();
 }
@@ -27,7 +28,7 @@ void NetworkClient::startThreads() {
 	recvThread = std::thread(&NetworkClient::recvLoop, this);
 	sendThread = std::thread(&NetworkClient::sendLoop, this);
         status->setNetworckThreadsSost(true);
-    std::cerr << "Потоки запущены" << std::endl;
+    get_logger() << "Потоки запущены";
 }
 
 // Остановка потоков приёма и отправки
@@ -37,7 +38,7 @@ void NetworkClient::stopThreads() {
 	if (recvThread.joinable()) recvThread.join();
 	if (sendThread.joinable()) sendThread.join();
         status->setNetworckThreadsSost(false);
-    std::cerr << "Потоки остановлены" << std::endl;
+    get_logger() << "Потоки остановлены";
 }
 
 // Функция для потока приёма
@@ -73,7 +74,7 @@ void NetworkClient::recvLoop() {
                     status->pushAcceptedMessage(msg);
 				}
 			} catch (const std::exception& e) {
-				std::cerr << "Ошибка приёма: " << e.what() << std::endl;
+				get_logger() << "Ошибка приёма: " << e.what();
 				break;
 			}
 		} else if (sel == 0) {
@@ -81,7 +82,7 @@ void NetworkClient::recvLoop() {
 			// пропускаем для  того чтобы перепроверить флаг работоспособности
 			continue;
 		} else if (sel < 0) {
-			std::cerr << "Ошибка select() в recvLoop" << std::endl;
+			get_logger() << "Ошибка select() в recvLoop";
 			break;
 		}
 	}
@@ -95,7 +96,7 @@ void NetworkClient::sendLoop() {
 			try {
 				sendMess(msg);
 			} catch (const std::exception& e) {
-				std::cerr << "Ошибка отправки: " << e.what() << std::endl;
+				get_logger() << "Ошибка отправки: " << e.what();
 				break;
 			}
 		}
@@ -119,7 +120,7 @@ void NetworkClient::connecting() {
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
             status->setNetworckConnect(false);
             err = true;
-            std::cerr << "Ошибка инициализации WinSock\n";
+            get_logger() << "Ошибка инициализации WinSock";
             throw std::runtime_error("Ошибка инициализации WinSock");
         }
         wsaInitialized = true;
@@ -130,7 +131,7 @@ void NetworkClient::connecting() {
     if (sock == INVALID_SOCKET) {
         status->setNetworckConnect(false);
         err = true;
-        std::cerr << "Не удалось создать сокет\n";
+        get_logger() << "Не удалось создать сокет";
         throw std::runtime_error("Не удалось создать сокет");
     }
 
@@ -141,7 +142,7 @@ void NetworkClient::connecting() {
     // Проверка IP-адреса
     if (inet_pton(AF_INET, server_ip.c_str(), &serv_addr.sin_addr) <= 0) {
         closesocket(sock);
-        std::cerr << "Некорректный адрес сервера\n";
+        get_logger() << "Некорректный адрес сервера";
         status->setNetworckConnect(false);
         err = true;
     }
@@ -151,7 +152,7 @@ void NetworkClient::connecting() {
         int errorCode = WSAGetLastError();
         if (errorCode != WSAEINPROGRESS) {  // Игнорируем асинхронные ошибки
             closesocket(sock);
-            std::cerr << "Ошибка подключения: " << errorCode << "\n";
+            get_logger() << "Ошибка подключения: " << errorCode;
             status->setNetworckConnect(false);
             err = true;
         }
@@ -170,7 +171,7 @@ void NetworkClient::connecting() {
 
         if (sel < 0) {
             int selErr = WSAGetLastError();
-            std::cerr << "select() error: " << selErr << "\n";
+            get_logger() << "select() error: " << selErr << "\n";
             closesocket(sock);
             status->setNetworckConnect(false);
         }
@@ -185,20 +186,20 @@ void NetworkClient::connecting() {
                 int r = recv(sock, &peekBuf, 1, MSG_PEEK);
                 if (r == 0) {
                     // сервер закрыл соединение
-                    std::cerr << "Peer закрыл соединение сразу после connect()\n";
+                    get_logger() << "Peer закрыл соединение сразу после connect()";
                     closesocket(sock);
                     status->setNetworckConnect(false);
                 } else if (r > 0) {
                     // пришли данные — считаем handshake успешным
                     status->setNetworckConnect(true);
-                    std::cerr << "CONNECT ON\n";
+                    get_logger() << "CONNECT ON";
                 } else { // r == SOCKET_ERROR
                     int recvErr = WSAGetLastError();
                     if (recvErr == WSAEWOULDBLOCK) {
                         // гонка — treat as success
                         status->setNetworckConnect(true);
                     } else {
-                        std::cerr << "recv(MSG_PEEK) error: " << recvErr << "\n";
+                        get_logger() << "recv(MSG_PEEK) error: " << recvErr;
                         closesocket(sock);
                         status->setNetworckConnect(false);
                     }
@@ -217,7 +218,7 @@ void NetworkClient::connecting() {
 // ОТПРАВКА СООБЩЕНИЯ
 void NetworkClient::sendMess(const std::string& message) {
 	if (send(sock, message.c_str(), message.size(), 0) == SOCKET_ERROR){
-		std::cerr << "Ошибка отправки\n";
+		get_logger() << "Ошибка отправки\n";
                 status->setNetworckConnect(false);
 		// throw std::runtime_error("Ошибка отправки");
 	}
@@ -284,7 +285,7 @@ std::string NetworkClient::getMess() {
 
             const size_t MAX_ALLOWED = 32 * 1024 * 1024;    // 32 MB
             if (recv_buffer_.size() > MAX_ALLOWED) {        // защитный лимит
-                std::cerr << "Получено слишком большое сообщение: " << recv_buffer_.size() << " байт\n";
+                get_logger() << "Получено слишком большое сообщение: " << recv_buffer_.size() << " байт";
                 status->setNetworckConnect(false);
                 throw std::runtime_error("Сообщение превышает допустимый размер");
             }
@@ -300,7 +301,7 @@ std::string NetworkClient::getMess() {
             // иначе — продолжим читать (recv будет блокировать, пока не появятся данные)
             continue;
         } else if (n == 0) { // соединение закрыто
-            std::cerr << "getMess | Сервер закрыл соединение\n";
+            get_logger() << "getMess | Сервер закрыл соединение";
             status->setNetworckConnect(false);
             return "";
         } else { // n < 0 - ошибка
@@ -311,7 +312,7 @@ std::string NetworkClient::getMess() {
                 // если сокет неблокирующий — можно подождать или просто продолжить
                 continue;
             } else {
-                std::cerr << "recv error: " << err << "\n";
+                get_logger() << "recv error: " << err;
                 status->setNetworckConnect(false);
                 throw std::runtime_error("Ошибка чтения сокета");
             }

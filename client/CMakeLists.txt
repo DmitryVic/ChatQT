@@ -51,6 +51,7 @@ set(CONSOLE_SRC_FILES
     MessageHandler.cpp
     ${NETWORK_CLIENT_SRC}
     UserStatus.cpp
+    Logger.cpp
 )
 
 # Qt UI исходники (лежат в ui папке)
@@ -112,6 +113,12 @@ add_executable(Chat_client
     
     # Переводы
     ${QM_FILES}
+)
+
+# Отключаем консоль для всех платформ через свойства Qt
+set_target_properties(Chat_client PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
 )
 
 # СЕТЕВЫЕ НАСТРОЙКИ ИЗ КОНСОЛЬНОЙ ВЕРСИИ

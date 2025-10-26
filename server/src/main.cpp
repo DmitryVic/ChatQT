@@ -14,6 +14,7 @@
 #include <filesystem>
 #include "Logger.h"
 #include <exception>
+#include "Logger.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -31,21 +32,21 @@ int main() {
     try {
         std::locale::global(std::locale("ru_RU.UTF-8"));
     } catch (const std::exception& e) {
-        std::cerr << "Locale error: " << e.what() << std::endl;
+        get_logger() << "Locale error: " << e.what() << "\n";
         std::locale::global(std::locale("C.UTF-8"));
     }
     #endif
 
     try {
         
-        get_logger() << "Старт сервера (main) ...";
+        get_logger() << "Старт сервера (main) ...\n";
 
         std::shared_ptr<NetworkServer> network = std::make_shared<NetworkServer>(PORT);
         network->start();
         chat_start(network);
 
     } catch (const exception& e) {
-        std::cerr << "Ошибка: " << e.what() << std::endl;
+        get_logger() << "Ошибка: " << e.what() << "\n";
         return 1;
     }
 
