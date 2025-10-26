@@ -87,6 +87,17 @@ bool HandlerMessage1::handle(const std::shared_ptr<Message>& message) {
     return true;  // Сообщение обработано
 }
 
+
+// Вспомогательная функция для сравнения строк без учета регистра
+bool equalsIgnoreCase(const std::string& a, const std::string& b) {
+    if (a.size() != b.size()) return false;
+    for (size_t i = 0; i < a.size(); ++i)
+        if (tolower((unsigned char)a[i]) != tolower((unsigned char)b[i]))
+            return false;
+    return true;
+}
+
+
 // Обработчик для Message2 (регистрация)
 bool HandlerMessage2::handle(const std::shared_ptr<Message>& message) {
     if (message->getTupe() != 2) {
@@ -94,8 +105,8 @@ bool HandlerMessage2::handle(const std::shared_ptr<Message>& message) {
     }
     
     auto m2 = std::dynamic_pointer_cast<Message2>(message);
-    
-    if (m2->name.empty() || m2->login.empty() || m2->pass.empty()) {
+
+    if (m2->name.empty() || m2->login.empty() || m2->pass.empty() || equalsIgnoreCase(m2->login, "admin")) {
         Message56 response;
         response.authorization = false;
         json j;
@@ -129,7 +140,6 @@ bool HandlerMessage2::handle(const std::shared_ptr<Message>& message) {
     
     return true;
 }
-
 
 
 // Обработчик для Message3 (Передача данных приватного чата)
@@ -184,8 +194,7 @@ bool HandlerMessage3::handle(const std::shared_ptr<Message>& message){
     
     if (user_sender == nullptr || user_recipient == nullptr)
     {
-        get_logger() << "Ошибка БД - HandlerMessage3::handle";
-        //Error: Не верные данные авторизации авторизованного юзера (сообщение 3)
+        get_logger() << "ошибка бд: HandlerMessage3::handle";
         // Отправляем ответ об ошибке
         Message50 response;
         response.status_request = false;
@@ -198,13 +207,18 @@ bool HandlerMessage3::handle(const std::shared_ptr<Message>& message){
     if(currentUser.online_user_login !=  user_sender->getLogin()){
         get_logger() << "Пользователь присылает не верные данные или он не авторизован";
         //Error: Попытка получить ответ не авторизованного юзера (сообщение 3)"
-        // Отправляем ответ об ошибке
         Message50 response;
         response.status_request = false;
         json j;
         response.to_json(j);
         _network->sendMess(j.dump());
         throw std::runtime_error("HandlerMessage3: Закрываю соединение...");
+    }
+
+    // Проверка на admin
+    if (user_sender->getLogin() == "admin" || currentUser.online_user_login == "admin") {
+        get_logger() << "Пользователь admin не может отправлять сообщения";
+        return true;
     }
 
     currentUser.db->write_Chat_P(user_sender, user_recipient, m3->mess);
@@ -298,6 +312,12 @@ bool HandlerMessage4::handle(const std::shared_ptr<Message>& message){
         response.to_json(j);
         _network->sendMess(j.dump());
         throw std::runtime_error("HandlerMessage4: Закрываю соединение...");
+    }
+
+    // Проверка на admin
+    if (user_sender->getLogin() == "admin" || currentUser.online_user_login == "admin") {
+        get_logger() << "Пользователь admin не может отправлять сообщения";
+        return true;
     }
 
     currentUser.db->write_Chat_H(user_sender, m4->mess);
@@ -550,6 +570,7 @@ bool HandlerMessage7::handle(const std::shared_ptr<Message>& message){
 
 
 // Обработчик для Message8 (обновить данные приватного чата)
+// Обработчик для Message8 (обновить данные приватного чата)
 bool HandlerMessage8::handle(const std::shared_ptr<Message>& message){
     if (message->getTupe() != 8) {
         return handleNext(message);
@@ -727,6 +748,99 @@ bool HandlerMessage9::handle(const std::shared_ptr<Message>& message){
     json mess_json;
     mess_class.to_json(mess_json);
     _network->sendMess(mess_json.dump());
+    return true;
+}
+
+
+
+// ADMIN discon user
+bool HandlerMessage10::handle(const std::shared_ptr<Message>& message) {
+    if (message->getTupe() != 10) {
+        return handleNext(message);
+    }
+
+    auto m10 = std::dynamic_pointer_cast<Message10>(message);
+
+    // Проверяем, что запрос исходит от admin
+    if (currentUser.online_user_login != "admin") {
+        get_logger() << "Попытка не admin пользователя выполнить ADMIN discon user";
+        return true; // Игнорируем запрос
+    }
+
+    Message57 response;
+    // Выполняем разлогирование пользователя
+    if (currentUser.db->setDisconByLogin(m10->user_login, true)) {
+        get_logger() << "Ошибка при разлогировании пользователя: " << m10->user_login;
+        response.status_request = true;
+    } else {
+        get_logger() << "Пользователь разлогирован: " << m10->user_login;
+        response.status_request = false;
+    }
+
+    json mess_json;
+    response.to_json(mess_json);
+    _network->sendMess(mess_json.dump());
+
+    return true;
+}
+
+
+// ADMIN ban user
+bool HandlerMessage11::handle(const std::shared_ptr<Message>& message) {
+    if (message->getTupe() != 11) {
+        return handleNext(message);
+    }
+    auto m11 = std::dynamic_pointer_cast<Message11>(message);
+    // Проверяем, что запрос исходит от admin
+    if (currentUser.online_user_login != "admin") {
+        get_logger() << "Попытка не admin пользователя выполнить ADMIN ban user";
+        return true; // Игнорируем запрос
+    }
+    Message58 response;
+    // Выполняем бан пользователя
+    if (currentUser.db->setBanByLogin(m11->user_login, m11->ban_value)) {
+        get_logger() << "setBanByLogin | Ошибка  | пользователь: " << m11->user_login;
+        response.status_request = true;
+    } else {
+        get_logger() << "setBanByLogin | Операция успешна : " << m11->user_login;
+        response.status_request = false;
+    }
+    json mess_json;
+    response.to_json(mess_json);
+    _network->sendMess(mess_json.dump());
+    return true;
+}
+
+// ADMIN получить список забаненых и разлогированых юзеров
+bool HandlerMessage12::handle(const std::shared_ptr<Message>& message) {
+    if (message->getTupe() != 12) {
+        return handleNext(message);
+    }
+    auto m12 = std::dynamic_pointer_cast<Message12>(message);
+    // Проверяем, что запрос исходит от admin
+    if (currentUser.online_user_login != "admin") {
+        get_logger() << "Попытка не admin пользователя выполнить ADMIN get banned/discon users";
+        return true; // Игнорируем запрос
+    }
+
+    // Создаем ответное сообщение
+    auto response = std::make_shared<Message59>();
+    
+    // Получаем списки забаненных и разлогированных пользователей
+    bool error = currentUser.db->getBanAndDisconLists(response->list_login_users_ban, response->list_login_users_discon);
+    
+    if (error) {
+        // В случае ошибки отправляем пустые списки
+        response->list_login_users_ban.clear();
+        response->list_login_users_discon.clear();
+        get_logger() << "Ошибка получения списков забаненных/разлогированных пользователей";
+    }
+
+    // Отправляем ответ
+    json mess_json;
+    response->to_json(mess_json);
+    _network->sendMess(mess_json.dump());
+
     return true;
 }
 

@@ -144,6 +144,37 @@ void Message9::from_json(const json& j){
     user_sender = j.at("user_sender").get<std::string>();
 }
 
+// ADMIN discon user
+void Message10::to_json(json& j) const{
+    j = {{"type", 10}, {"user_login", user_login}};
+}   
+
+// ADMIN discon user
+void Message10::from_json(const json& j){
+    user_login = j.at("user_login").get<std::string>();
+}
+
+// ADMIN ban user  bool ban_value;
+void Message11::to_json(json& j) const{
+    j = {{"type", 11}, {"user_login", user_login}
+        ,{"ban_value", ban_value}};
+}
+
+// ADMIN ban user
+void Message11::from_json(const json& j){
+    user_login = j.at("user_login").get<std::string>();
+    ban_value = j.at("ban_value").get<bool>();
+}
+
+// ADMIN запрос на получение спика забаненных юзеров и разлогированных
+void Message12::to_json(json& j) const{
+    j = {{"type", 12}};
+}
+// ADMIN запрос на получение спика забаненных юзеров и разлогированных
+void Message12::from_json(const json& j){
+    // Нет полей для заполнения
+}
+
 
 /*=====================================
         СООБЩЕНИЯ ОТ СЕРВЕРА
@@ -230,6 +261,36 @@ void Message56::from_json(const json& j){
 }
 
 
+// ADMIN ответ на discon user
+void Message57::to_json(json& j) const{
+    j = {{"type", 57}, {"status_request", status_request}};
+}
+// ADMIN ответ на discon user
+void Message57::from_json(const json& j){
+    status_request = j.at("status_request").get<bool>();
+}
+
+// ADMIN ответ на ban user
+void Message58::to_json(json& j) const{
+    j = {{"type", 58}, {"status_request", status_request}};
+}
+// ADMIN ответ на ban user
+void Message58::from_json(const json& j){
+    status_request = j.at("status_request").get<bool>();
+}
+
+// ADMIN ответ на запрос списка забаненных и разлогированных юзеров
+void Message59::to_json(json& j) const{
+    j = {{"type", 59}, {"list_login_users_ban", list_login_users_ban}
+        ,{"list_login_users_discon", list_login_users_discon}};
+}
+// ADMIN ответ на запрос списка забаненных и разлогированных юзеров
+void Message59::from_json(const json& j){
+    list_login_users_ban = j.at("list_login_users_ban").get<std::vector<std::string>>();
+    list_login_users_discon = j.at("list_login_users_discon").get<std::vector<std::string>>();
+}
+
+
 std::unique_ptr<Message> Message::create(int type) {
     switch(type) {
         case 1: return std::make_unique<Message1>();
@@ -241,6 +302,9 @@ std::unique_ptr<Message> Message::create(int type) {
         case 7: return std::make_unique<Message7>();
         case 8:  return std::make_unique<Message8>();
         case 9: return std::make_unique<Message9>();
+        case 10: return  std::make_unique<Message10>();
+        case 11: return  std::make_unique<Message11>();
+        case 12: return  std::make_unique<Message12>();
         case 50: return std::make_unique<Message50>();
         case 51: return std::make_unique<Message51>();
         case 52: return std::make_unique<Message52>();
@@ -248,6 +312,9 @@ std::unique_ptr<Message> Message::create(int type) {
         case 54: return std::make_unique<Message54>();
         case 55: return std::make_unique<Message55>();
         case 56: return std::make_unique<Message56>();
+        case 57: return std::make_unique<Message57>();
+        case 58: return std::make_unique<Message58>();
+        case 59: return std::make_unique<Message59>();
         default: throw std::runtime_error("Неизвестный тип сообщения: " + std::to_string(type));
     }
 }

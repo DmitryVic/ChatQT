@@ -229,6 +229,34 @@ public:
     void from_json(const json& j) override;
 };
 
+
+// ADMIN discon user
+class Message10 : public Message {
+public:
+    std::string user_login;
+    int getTupe() const override { return 10; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
+// ADMIN ban user
+class Message11 : public Message {
+public:
+    std::string user_login;
+    bool ban_value;
+    int getTupe() const override { return 11; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
+// ADMIN запрос на получение спика забаненных юзеров и разлогированных
+class Message12 : public Message {
+public:
+    int getTupe() const override { return 12; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
 /*=====================================
         СООБЩЕНИЯ ОТ СЕРВЕРА
 =====================================*/
@@ -327,6 +355,35 @@ public:
     
     void to_json(json& j) const override;
     
+    void from_json(const json& j) override;
+};
+
+
+// ADMIN ответ на discon user
+class Message57 : public Message {
+public:
+    bool status_request;
+    int getTupe() const override { return 57; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
+// ADMIN ответ на ban user
+class Message58 : public Message {
+public:
+    bool status_request;
+    int getTupe() const override { return 58; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
+// ADMIN ответ на запрос списка забаненных и разлогированных юзеров
+class Message59 : public Message {
+public:
+    std::vector<std::string> list_login_users_ban;
+    std::vector<std::string> list_login_users_discon;
+    int getTupe() const override { return 59; }
+    void to_json(json& j) const override;
     void from_json(const json& j) override;
 };
 

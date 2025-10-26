@@ -7,6 +7,7 @@
 #include <mysql/mysql.h>
 #include "Logger.h"
 #include "Message.h"
+#include "sha1.h"
 
 
 DataBaseMySQL::DataBaseMySQL()
@@ -96,6 +97,43 @@ DataBaseMySQL::DataBaseMySQL()
             sql_res = nullptr;
             // НЕТ ПРОВЕРКИ НА НЕСКОЛЬКО ПОДОБНЫХ ЧАТОВ В БД
         }
+    }
+
+    // ========= Создание пользователя admin, если его нет =========
+    // Проверяем существование пользователя admin
+    std::string check_admin = "SELECT id FROM users WHERE login = 'admin' LIMIT 1;";
+    if (mysql_query(&sql_mysql, check_admin.c_str()) != 0) {
+        throw std::runtime_error("Ошибка проверки существования admin: " + std::string(mysql_error(&sql_mysql)));
+    }
+
+    sql_res = mysql_store_result(&sql_mysql);
+    if (!sql_res) {
+        throw std::runtime_error("Ошибка получения результата проверки admin");
+    }
+
+    if (mysql_num_rows(sql_res) == 0) {
+        mysql_free_result(sql_res);
+        sql_res = nullptr;
+
+        // Создаем пользователя admin
+        std::string create_admin_user = "INSERT INTO users (login, name) VALUES ('admin', 'Administrator');";
+        if (mysql_query(&sql_mysql, create_admin_user.c_str()) != 0) {
+            throw std::runtime_error("Ошибка создания пользователя admin: " + std::string(mysql_error(&sql_mysql)));
+        }
+
+        // Добавляем пароль для admin
+        std::string admin_pass = hashToString(sha1("admin")); // Используем такой же метод хеширования как в write_User
+        std::string create_admin_pass = 
+            "INSERT INTO user_passwords (user_id, pass) "
+            "SELECT id, '" + escapeString(admin_pass) + "' "
+            "FROM users WHERE login = 'admin';";
+            
+        if (mysql_query(&sql_mysql, create_admin_pass.c_str()) != 0) {
+            throw std::runtime_error("Ошибка создания пароля для admin: " + std::string(mysql_error(&sql_mysql)));
+        }
+    } else {
+        mysql_free_result(sql_res);
+        sql_res = nullptr;
     }
 }
 
@@ -199,11 +237,12 @@ std::shared_ptr<User> DataBaseMySQL::search_User(const std::string& log){
 }
 
 
-// Получить список всех юзеров исключая юзера, который делает запрос
+// Получить список всех юзеров исключая юзера, который делает запрос (и исключая admin)
 std::vector<std::pair<std::string, std::string>> DataBaseMySQL::list_all_User(std::string my_login){
     
     std::vector<std::pair<std::string, std::string>> send;
-    std::string request_mysql =  "SELECT u.login, u.name FROM users u WHERE u.login <> '" + escapeString(my_login) + "';";
+    // Исключаем пользователя, который делает запрос, и системного администратора 'admin'
+    std::string request_mysql =  "SELECT u.login, u.name FROM users u WHERE u.login NOT IN ('" + escapeString(my_login) + "', '" + escapeString(std::string("admin")) + "');";
     
     // Выполнение запроса
     if (mysql_query(&sql_mysql, request_mysql.c_str()) != 0) {
@@ -706,5 +745,50 @@ bool DataBaseMySQL::setDisconByLogin(const std::string& login, bool disconValue)
         // пользователь существует, affected_rows == 0 -> значение прежнее, считаем успешно
     }
 
+    return false; // успешно
+}
+
+// ADMIN: Получение списков забаненных и разлогированных юзеров
+bool DataBaseMySQL::getBanAndDisconLists(std::vector<std::string>& banList, std::vector<std::string>& disconList) {
+    
+    banList.clear();
+    disconList.clear();
+    std::string request = "SELECT login, ban, discon FROM users WHERE ban = 1 OR discon = 1;";
+
+    if (mysql_query(&sql_mysql, request.c_str()) != 0) {
+        get_logger() << "Ошибка БД (MySQL) getBanAndDisconLists: " << mysql_error(&sql_mysql);
+        return true; // ошибка
+    }
+
+    MYSQL_RES* res = mysql_store_result(&sql_mysql);
+    if (!res) {
+        if (mysql_errno(&sql_mysql)) {
+            get_logger() << "Ошибка получения результата getBanAndDisconLists: " << mysql_error(&sql_mysql);
+            return true;
+        }
+        // нет результатов — просто пустые списки
+        return false;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(res))) {
+        std::string login = row[0] ? row[0] : "";
+        // ban и discon могут быть NULL, "0"/"1" или "true"/"false"
+        bool isBan = false;
+        bool isDiscon = false;
+        if (row[1]) {
+            std::string val = row[1];
+            isBan = (val == "1" || val == "true");
+        }
+        if (row[2]) {
+            std::string val = row[2];
+            isDiscon = (val == "1" || val == "true");
+        }
+
+        if (isBan) banList.push_back(login);
+        if (isDiscon) disconList.push_back(login);
+    }
+
+    mysql_free_result(res);
     return false; // успешно
 }

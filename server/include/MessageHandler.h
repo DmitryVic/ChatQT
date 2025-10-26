@@ -115,6 +115,29 @@ public:
 };
 
 
+// ADMIN discon user
+class HandlerMessage10 : public MessageHandler {
+public:
+    using MessageHandler::MessageHandler;
+
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+// ADMIN ban user
+class HandlerMessage11 : public MessageHandler {
+public:
+    using MessageHandler::MessageHandler;
+
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+// ADMIN запрос на получение спика забаненных юзеров и разлогированных
+class HandlerMessage12 : public MessageHandler {
+public:
+    using MessageHandler::MessageHandler;
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
 // Обработчик для неизвестных сообщений
 class HandlerErr : public MessageHandler {
 public:
