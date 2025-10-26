@@ -847,6 +847,40 @@ bool HandlerMessage12::handle(const std::shared_ptr<Message>& message) {
 }
 
 
+// ADMIN: получить список сообщений (для админа)
+bool HandlerMessage13::handle(const std::shared_ptr<Message>& message) {
+    if (message->getTupe() != 13) {
+        return handleNext(message);
+    }
+
+    auto m13 = std::dynamic_pointer_cast<Message13>(message);
+
+    // Проверяем, что запрос исходит от admin
+    if (currentUser.online_user_login != "admin") {
+        get_logger() << "Попытка не admin пользователя выполнить ADMIN get messages";
+        return true; // Игнорируем запрос
+    }
+
+    // Создаем ответное сообщение
+    auto response = std::make_shared<Message60>();
+
+    // Получаем список сообщений для админа
+    bool error = currentUser.db->getMessagesForAdmin(response->list_messages);
+
+    if (error) {
+        response->list_messages.clear();
+        get_logger() << "Ошибка получения списка сообщений для админа";
+    }
+
+    // Отправляем ответ
+    json mess_json;
+    response->to_json(mess_json);
+    _network->sendMess(mess_json.dump());
+
+    return true;
+}
+
+
 // Обработчик для неизвестных сообщений
 bool HandlerErr::handle(const std::shared_ptr<Message>& message) {
     get_logger() << "Неизвестный тип сообщения: " << message->getTupe();

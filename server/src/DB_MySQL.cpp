@@ -505,7 +505,7 @@ bool DataBaseMySQL::load_Chat_P(std::shared_ptr<User> user_sender, std::shared_p
         mesST.userLogin = sql_row[0];
         mesST.userName = sql_row[1];
         mesST.mess = sql_row[2];
-        mesST.time = stringToTimestamp(sql_row[3]);
+        mesST.time = stringToTimestamp(sql_row[3] ? sql_row[3]  : "1970-01-01 00:00:00");
         out.emplace_back(mesST);
     }
     mysql_free_result(sql_res);
@@ -577,7 +577,7 @@ bool DataBaseMySQL::load_Chat_H(std::vector<MessageStruct>& out) {
         mesST.userLogin = sql_row[0];
         mesST.userName = sql_row[1];
         mesST.mess = sql_row[2];
-        mesST.time = stringToTimestamp(sql_row[3]);
+        mesST.time = stringToTimestamp(sql_row[3] ? sql_row[3]  : "1970-01-01 00:00:00");
         out.emplace_back(mesST);
     }
     mysql_free_result(sql_res);
@@ -792,6 +792,51 @@ bool DataBaseMySQL::getBanAndDisconLists(std::vector<AdminDataUsers>& listDataUs
         info.onlineStatus = !isDiscon;
 
         listDataUser.push_back(std::move(info));
+    }
+
+    mysql_free_result(res);
+    return false; // успешно
+}
+
+
+// ADMIN: Получение списка всех сообщений (для админа)
+bool DataBaseMySQL::getMessagesForAdmin(std::vector<MessageStructAdmin>& listMessages) {
+    listMessages.clear();
+
+    // Получаем все сообщения с информацией об отправителе и типе чата
+    std::string request =
+        "SELECT m.created_at, m.text, u.login, u.name, c.type "
+        "FROM messages m "
+        "JOIN users u ON u.id = m.sender_id "
+        "JOIN chats c ON c.id = m.chat_id "
+        "ORDER BY m.created_at;";
+
+    if (mysql_query(&sql_mysql, request.c_str()) != 0) {
+        get_logger() << "Ошибка БД (MySQL) getMessagesForAdmin: " << mysql_error(&sql_mysql);
+        return true; // ошибка
+    }
+
+    MYSQL_RES* res = mysql_store_result(&sql_mysql);
+    if (!res) {
+        if (mysql_errno(&sql_mysql)) {
+            get_logger() << "Ошибка получения результата getMessagesForAdmin: " << mysql_error(&sql_mysql);
+            return true;
+        }
+        // нет результатов — пустой список
+        return false;
+    }
+
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(res))) {
+        MessageStructAdmin m;
+        m.time = stringToTimestamp(row[0] ? row[0] : "1970-01-01 00:00:00");
+        m.mess = row[1] ? row[1] : "";
+        m.userLogin = row[2] ? row[2] : "";
+        m.userName = row[3] ? row[3] : "";
+        std::string chatType = row[4] ? row[4] : "";
+        m.messFromChatH = (chatType == "common");
+
+        listMessages.push_back(std::move(m));
     }
 
     mysql_free_result(res);

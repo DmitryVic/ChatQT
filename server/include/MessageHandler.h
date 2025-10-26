@@ -131,8 +131,15 @@ public:
     bool handle(const std::shared_ptr<Message>& message) override;
 };
 
-// ADMIN запрос на получение спика забаненных юзеров и разлогированных
+// ADMIN запрос на получение спика юзеров 
 class HandlerMessage12 : public MessageHandler {
+public:
+    using MessageHandler::MessageHandler;
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+// ADMIN запрос на получение списка сообщений
+class HandlerMessage13 : public MessageHandler {
 public:
     using MessageHandler::MessageHandler;
     bool handle(const std::shared_ptr<Message>& message) override;

@@ -74,6 +74,10 @@ public:
         // Возвращает список структур AdminDataUsers (userName, userLogin, banStatus, onlineStatus)
         virtual bool getBanAndDisconLists(std::vector<AdminDataUsers>& listDataUser) = 0;
 
+        // ADMIN: Получение списка всех сообщений (для админа)
+        // Возвращает вектор MessageStructAdmin (time, mess, userName, userLogin, messFromChatH)
+        virtual bool getMessagesForAdmin(std::vector<MessageStructAdmin>& listMessages) = 0;
+
 };
 
 

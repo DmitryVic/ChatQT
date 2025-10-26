@@ -179,6 +179,15 @@ void Message12::from_json(const json& j){
     // Нет полей для заполнения
 }
 
+// ADMIN запрос на получение списка сообщений
+void Message13::to_json(json& j) const{
+    j = {{"type", 13}};
+}
+// ADMIN запрос на получение списка сообщений
+void Message13::from_json(const json& j){ 
+    // Нет полей для заполнения
+} 
+
 
 /*=====================================
         СООБЩЕНИЯ ОТ СЕРВЕРА
@@ -296,7 +305,14 @@ void Message59::to_json(json& j) const{
 void Message59::from_json(const json& j){
     list_users = j.at("list_users").get<std::vector<AdminDataUsers>>();
 }
-
+// ADMIN ответ на запрос списка сообщений
+void Message60::to_json(json& j) const{
+    j = {{"type", 60}, {"list_messages", list_messages}};
+}
+// ADMIN ответ на запрос списка сообщений
+void Message60::from_json(const json& j){
+    list_messages = j.at("list_messages").get<std::vector<MessageStructAdmin>>();
+}
 
 std::unique_ptr<Message> Message::create(int type) {
     switch(type) {
@@ -311,7 +327,8 @@ std::unique_ptr<Message> Message::create(int type) {
         case 9: return std::make_unique<Message9>();
         case 10: return  std::make_unique<Message10>();
         case 11: return  std::make_unique<Message11>();
-        case 12: return  std::make_unique<Message12>();
+    case 12: return  std::make_unique<Message12>();
+    case 13: return  std::make_unique<Message13>();
         case 50: return std::make_unique<Message50>();
         case 51: return std::make_unique<Message51>();
         case 52: return std::make_unique<Message52>();
@@ -321,7 +338,8 @@ std::unique_ptr<Message> Message::create(int type) {
         case 56: return std::make_unique<Message56>();
         case 57: return std::make_unique<Message57>();
         case 58: return std::make_unique<Message58>();
-        case 59: return std::make_unique<Message59>();
+    case 59: return std::make_unique<Message59>();
+    case 60: return std::make_unique<Message60>();
         default: throw std::runtime_error("Неизвестный тип сообщения: " + std::to_string(type));
     }
 }

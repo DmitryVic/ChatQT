@@ -84,6 +84,9 @@ public:
         // ADMIN: Получение списка пользователей с информацией (ban/discon)
         bool getBanAndDisconLists(std::vector<AdminDataUsers>& listDataUser) override;
 
+        // ADMIN: Получение списка всех сообщений (для админа)
+        bool getMessagesForAdmin(std::vector<MessageStructAdmin>& listMessages) override;
+
         /*=====================================
                 ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
         =====================================*/

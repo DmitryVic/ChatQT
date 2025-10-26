@@ -82,6 +82,36 @@ struct AdminDataUsers {
     }
 };
 
+//стрруктура сообщения
+struct MessageStructAdmin
+{
+    Timestamp time;
+    std::string mess;
+    std::string userName;
+    std::string userLogin;
+    bool messFromChatH; // true - сообщение из общего чата, false - из приватного
+    
+    // Метод для сериализации в JSON
+    void to_json(json& j) const {
+        j = {
+            {"time", std::chrono::system_clock::to_time_t(time)},
+            {"mess", mess},
+            {"userName", userName},
+            {"userLogin", userLogin},
+            {"messFromChatH", messFromChatH}
+        };
+    }
+
+    // Метод для десериализации из JSON
+    void from_json(const json& j) {
+        time = std::chrono::system_clock::from_time_t(j.at("time").get<std::time_t>());
+        mess = j.at("mess").get<std::string>();
+        userName = j.at("userName").get<std::string>();
+        userLogin = j.at("userLogin").get<std::string>();
+        messFromChatH = j.at("messFromChatH").get<bool>();
+    }
+};
+
 // Регистрация типов для работы с JSON
 namespace nlohmann {
     template<>
@@ -113,6 +143,17 @@ namespace nlohmann {
         }
 
         static void from_json(const json& j, AdminDataUsers& r) {
+            r.from_json(j);
+        }
+    };
+
+    template<>
+    struct adl_serializer<MessageStructAdmin> {
+        static void to_json(json& j, const MessageStructAdmin& r) {
+            r.to_json(j);
+        }
+
+        static void from_json(const json& j, MessageStructAdmin& r) {
             r.from_json(j);
         }
     };
@@ -296,6 +337,14 @@ public:
     void from_json(const json& j) override;
 };
 
+// ADMIN запрос на получение списка сообщений
+class Message13 : public Message {
+public:
+    int getTupe() const override { return 13; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
 /*=====================================
         СООБЩЕНИЯ ОТ СЕРВЕРА
 =====================================*/
@@ -425,6 +474,15 @@ class Message59 : public Message {
 public:
     std::vector<AdminDataUsers> list_users;
     int getTupe() const override { return 59; }
+    void to_json(json& j) const override;
+    void from_json(const json& j) override;
+};
+
+// ADMIN ответ на запрос списка сообщений
+class Message60 : public Message {
+public:
+    std::vector<MessageStructAdmin> list_messages;
+    int getTupe() const override { return 60; }
     void to_json(json& j) const override;
     void from_json(const json& j) override;
 };
