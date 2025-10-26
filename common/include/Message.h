@@ -57,6 +57,31 @@ struct MessageStruct
     }
 };
 
+struct AdminDataUsers {
+    std::string userName;
+    std::string userLogin;
+    bool banStatus;
+    bool onlineStatus;
+
+     // Метод для сериализации в JSON
+    void to_json(json& j) const {
+        j = {
+            {"userName", userName},
+            {"userLogin", userLogin},
+            {"banStatus", banStatus},
+            {"onlineStatus", onlineStatus}
+        };
+    }
+
+    // Метод для десериализации из JSON
+    void from_json(const json& j) {
+        userName = j.at("userName").get<std::string>();
+        userLogin = j.at("userLogin").get<std::string>();
+        banStatus = j.at("banStatus").get<bool>();
+        onlineStatus = j.at("onlineStatus").get<bool>();
+    }
+};
+
 // Регистрация типов для работы с JSON
 namespace nlohmann {
     template<>
@@ -78,6 +103,17 @@ namespace nlohmann {
 
         static void from_json(const json& j, Timestamp& ts) {
             ts = stringToTimestamp(j.get<std::string>());
+        }
+    };
+
+    template<>
+    struct adl_serializer<AdminDataUsers> {
+        static void to_json(json& j, const AdminDataUsers& r) {
+            r.to_json(j);
+        }
+
+        static void from_json(const json& j, AdminDataUsers& r) {
+            r.from_json(j);
         }
     };
 }
@@ -229,6 +265,9 @@ public:
     void from_json(const json& j) override;
 };
 
+/*=====================================
+        ADMIN СОБЩЕНИЯ ОТ КЛИЕНТА
+=====================================*/
 
 // ADMIN discon user
 class Message10 : public Message {
@@ -249,7 +288,7 @@ public:
     void from_json(const json& j) override;
 };
 
-// ADMIN запрос на получение спика забаненных юзеров и разлогированных
+// ADMIN запрос на получение спика  юзеров
 class Message12 : public Message {
 public:
     int getTupe() const override { return 12; }
@@ -359,6 +398,10 @@ public:
 };
 
 
+/*=====================================
+        ADMIN СОБЩЕНИЯ ОТ СЕРВЕРА
+=====================================*/
+
 // ADMIN ответ на discon user
 class Message57 : public Message {
 public:
@@ -377,11 +420,10 @@ public:
     void from_json(const json& j) override;
 };
 
-// ADMIN ответ на запрос списка забаненных и разлогированных юзеров
+// ADMIN ответ на запрос списка юзеров
 class Message59 : public Message {
 public:
-    std::vector<std::string> list_login_users_ban;
-    std::vector<std::string> list_login_users_discon;
+    std::vector<AdminDataUsers> list_users;
     int getTupe() const override { return 59; }
     void to_json(json& j) const override;
     void from_json(const json& j) override;

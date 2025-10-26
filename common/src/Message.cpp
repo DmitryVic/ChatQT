@@ -144,6 +144,10 @@ void Message9::from_json(const json& j){
     user_sender = j.at("user_sender").get<std::string>();
 }
 
+/*=====================================
+        ADMIN СОБЩЕНИЯ ОТ КЛИЕНТА   
+=====================================*/
+
 // ADMIN discon user
 void Message10::to_json(json& j) const{
     j = {{"type", 10}, {"user_login", user_login}};
@@ -259,6 +263,11 @@ void Message56::from_json(const json& j){
     my_name = j.at("my_name").get<std::string>();
     my_login = j.at("my_login").get<std::string>();
 }
+
+
+/*=====================================
+        СООБЩЕНИЯ ОТ СЕРВЕРА
+=====================================*/
 
 
 // ADMIN ответ на discon user
