@@ -81,8 +81,8 @@ public:
         // Установка discon по логину. Возвращает флаг ошибки: true — была ошибка (например пользователь не найден или ошибка БД), false — успешно.
         bool setDisconByLogin(const std::string& login, bool disconValue);
 
-        // ADMIN: Получение списков забаненных и разлогированных юзеров
-        bool getBanAndDisconLists(std::vector<std::string>& banList, std::vector<std::string>& disconList) override;
+        // ADMIN: Получение списка пользователей с информацией (ban/discon)
+        bool getBanAndDisconLists(std::vector<AdminDataUsers>& listDataUser) override;
 
         /*=====================================
                 ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ

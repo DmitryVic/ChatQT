@@ -288,15 +288,13 @@ void Message58::from_json(const json& j){
     status_request = j.at("status_request").get<bool>();
 }
 
-// ADMIN ответ на запрос списка забаненных и разлогированных юзеров
+// ADMIN ответ на запрос списка пользователей с информацией (ban/online)
 void Message59::to_json(json& j) const{
-    j = {{"type", 59}, {"list_login_users_ban", list_login_users_ban}
-        ,{"list_login_users_discon", list_login_users_discon}};
+    j = {{"type", 59}, {"list_users", list_users}};
 }
-// ADMIN ответ на запрос списка забаненных и разлогированных юзеров
+// ADMIN ответ на запрос списка пользователей с информацией (ban/online)
 void Message59::from_json(const json& j){
-    list_login_users_ban = j.at("list_login_users_ban").get<std::vector<std::string>>();
-    list_login_users_discon = j.at("list_login_users_discon").get<std::vector<std::string>>();
+    list_users = j.at("list_users").get<std::vector<AdminDataUsers>>();
 }
 
 

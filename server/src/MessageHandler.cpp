@@ -752,6 +752,9 @@ bool HandlerMessage9::handle(const std::shared_ptr<Message>& message){
 }
 
 
+/*=====================================
+        ADMIN 
+=====================================*/
 
 // ADMIN discon user
 bool HandlerMessage10::handle(const std::shared_ptr<Message>& message) {
@@ -825,15 +828,14 @@ bool HandlerMessage12::handle(const std::shared_ptr<Message>& message) {
 
     // Создаем ответное сообщение
     auto response = std::make_shared<Message59>();
-    
-    // Получаем списки забаненных и разлогированных пользователей
-    bool error = currentUser.db->getBanAndDisconLists(response->list_login_users_ban, response->list_login_users_discon);
-    
+
+    // Получаем список всех пользователей с их статусами
+    bool error = currentUser.db->getBanAndDisconLists(response->list_users);
+
     if (error) {
-        // В случае ошибки отправляем пустые списки
-        response->list_login_users_ban.clear();
-        response->list_login_users_discon.clear();
-        get_logger() << "Ошибка получения списков забаненных/разлогированных пользователей";
+        // В случае ошибки отправляем пустой список
+        response->list_users.clear();
+        get_logger() << "Ошибка получения списка пользователей (ban/online)";
     }
 
     // Отправляем ответ

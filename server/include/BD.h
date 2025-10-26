@@ -70,8 +70,9 @@ public:
         virtual bool checkDisconByLogin(const std::string& login, bool& isDiscon) = 0;
         virtual bool setDisconByLogin(const std::string& login, bool disconValue) = 0;
 
-        // ADMIN: Получение списков забаненных и разлогированных юзеров
-        virtual bool getBanAndDisconLists(std::vector<std::string>& banList, std::vector<std::string>& disconList) = 0;
+        // ADMIN: Получение списка пользователей с информацией (ban/discon)
+        // Возвращает список структур AdminDataUsers (userName, userLogin, banStatus, onlineStatus)
+        virtual bool getBanAndDisconLists(std::vector<AdminDataUsers>& listDataUser) = 0;
 
 };
 

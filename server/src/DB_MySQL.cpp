@@ -748,12 +748,12 @@ bool DataBaseMySQL::setDisconByLogin(const std::string& login, bool disconValue)
     return false; // успешно
 }
 
-// ADMIN: Получение списков забаненных и разлогированных юзеров
-bool DataBaseMySQL::getBanAndDisconLists(std::vector<std::string>& banList, std::vector<std::string>& disconList) {
-    
-    banList.clear();
-    disconList.clear();
-    std::string request = "SELECT login, ban, discon FROM users WHERE ban = 1 OR discon = 1;";
+// ADMIN: Получение списка всех пользователей с информацией ban/discon
+bool DataBaseMySQL::getBanAndDisconLists(std::vector<AdminDataUsers>& listDataUser) {
+    listDataUser.clear();
+
+    // Получаем всех пользователей и их флаги ban/discon
+    std::string request = "SELECT login, name, ban, discon FROM users;";
 
     if (mysql_query(&sql_mysql, request.c_str()) != 0) {
         get_logger() << "Ошибка БД (MySQL) getBanAndDisconLists: " << mysql_error(&sql_mysql);
@@ -766,27 +766,32 @@ bool DataBaseMySQL::getBanAndDisconLists(std::vector<std::string>& banList, std:
             get_logger() << "Ошибка получения результата getBanAndDisconLists: " << mysql_error(&sql_mysql);
             return true;
         }
-        // нет результатов — просто пустые списки
+        // нет результатов — пустой список
         return false;
     }
 
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(res))) {
-        std::string login = row[0] ? row[0] : "";
-        // ban и discon могут быть NULL, "0"/"1" или "true"/"false"
+        AdminDataUsers info;
+        info.userLogin = row[0] ? row[0] : "";
+        info.userName = row[1] ? row[1] : "";
+
         bool isBan = false;
         bool isDiscon = false;
-        if (row[1]) {
-            std::string val = row[1];
-            isBan = (val == "1" || val == "true");
-        }
         if (row[2]) {
             std::string val = row[2];
+            isBan = (val == "1" || val == "true");
+        }
+        if (row[3]) {
+            std::string val = row[3];
             isDiscon = (val == "1" || val == "true");
         }
 
-        if (isBan) banList.push_back(login);
-        if (isDiscon) disconList.push_back(login);
+        info.banStatus = isBan;
+        // discon == true означает разлогирован; online = !discon
+        info.onlineStatus = !isDiscon;
+
+        listDataUser.push_back(std::move(info));
     }
 
     mysql_free_result(res);
