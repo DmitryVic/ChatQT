@@ -26,13 +26,21 @@ void chat_start(std::shared_ptr<NetworkServer> network) {
     auto Handler7 = std::make_unique<HandlerMessage7>(network);
     auto Handler8 = std::make_unique<HandlerMessage8>(network);
     auto Handler9 = std::make_unique<HandlerMessage9>(network);
+    auto Handler10 = std::make_unique<HandlerMessage10>(network);
+    auto Handler11 = std::make_unique<HandlerMessage11>(network);
+    auto Handler12 = std::make_unique<HandlerMessage12>(network);
+    auto Handler13 = std::make_unique<HandlerMessage13>(network);
     auto messageError = std::make_unique<HandlerErr>(network);
 
     // Строим цепочку С КОНЦА:  В ДРУГОМ ПОРЯДКЕ НЕЛЬЗЯ move ПЕРЕДАЕТ ВЛАДЕНИЕ ПОСЛЕ 1 ПЕРЕМЕШЕНИЯ ПЕРЕДАДИМ NULLPTR 
     messageError->setNext(nullptr);  
 
-    Handler9->setNext(std::move(messageError));// Последний в цепочке messageError
+    Handler13->setNext(std::move(messageError));// Последний в цепочке messageError
     // NEW
+    Handler12->setNext(std::move(Handler13));
+    Handler11->setNext(std::move(Handler12));
+    Handler10->setNext(std::move(Handler11));
+    Handler9->setNext(std::move(Handler10));
     Handler8->setNext(std::move(Handler9));
     Handler7->setNext(std::move(Handler8));
     Handler6->setNext(std::move(Handler7));
