@@ -77,10 +77,18 @@ int main (int argc, char *argv[])
     auto Handler54 = std::make_shared<HandlerMessage54>(userStatus);
     auto Handler55 = std::make_shared<HandlerMessage55>(userStatus);
     auto Handler56 = std::make_shared<HandlerMessage56>(userStatus);
+    auto Handler57 = std::make_shared<HandlerMessage57>(userStatus);
+    auto Handler58 = std::make_shared<HandlerMessage58>(userStatus);
+    auto Handler59 = std::make_shared<HandlerMessage59>(userStatus);
+    auto Handler60 = std::make_shared<HandlerMessage60>(userStatus);
     auto messageError = std::make_shared<HandlerErr>(userStatus);
     // Связываем
     messageError->setNext(nullptr);
-    Handler56->setNext(messageError);
+    Handler60->setNext(messageError);
+    Handler59->setNext(Handler60);
+    Handler58->setNext(Handler59);
+    Handler57->setNext(Handler58);
+    Handler56->setNext(Handler57);
     Handler55->setNext(Handler56);
     Handler54->setNext(Handler55);
     Handler53->setNext(Handler54);

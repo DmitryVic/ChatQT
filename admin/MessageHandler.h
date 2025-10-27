@@ -90,8 +90,48 @@ public:
 };
 
 
-// Обработка для Message56 (Ответ сервера вернуть имя)
+// Обработка для Message56 (Вы залогинены)
 class HandlerMessage56 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message57 ответ на discon user
+class HandlerMessage57 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message58  ответ на ban user
+class HandlerMessage58 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message59 ответ на запрос списка юзеров ADMIN
+class HandlerMessage59 : public MessageHandler {
+public:
+    //using для наследования конструкторов базового класса
+    using MessageHandler::MessageHandler;
+    
+    bool handle(const std::shared_ptr<Message>& message) override;
+};
+
+
+// Обработка для Message60 ADMIN ответ на запрос списка сообщений
+class HandlerMessage60 : public MessageHandler {
 public:
     //using для наследования конструкторов базового класса
     using MessageHandler::MessageHandler;

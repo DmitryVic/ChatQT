@@ -34,6 +34,7 @@ bool HandlerMessage50::handle(const std::shared_ptr<Message>& message) {
         // Пока ничего, это вообще теперь только ошибка авторизация на 56
         _status->stopApp();
     }
+    get_logger() << "HandlerMessage50 | Ошибка 50";
     return true;
 }
 
@@ -46,12 +47,7 @@ bool HandlerMessage51::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    auto m51 = std::dynamic_pointer_cast<Message51>(message);
-    _status->setChatOpen(chat::SHARED_CHAT);
-    _status->setMessList(std::move(m51->history_chat_H));
-    _status->setChatName("Общий чат");
-    // флаг что сообщения обновлены
-    _status->setResetMess(true);
+    get_logger() << "HandlerMessage51 | Пришло сообщение Message51 | Игнорирую";
     return true;
 }
 
@@ -63,17 +59,7 @@ bool HandlerMessage52::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    auto m52 = std::dynamic_pointer_cast<Message52>(message);
-    _status->setChatOpen(chat::PRIVATE_CHAT);
-    _status->setMessList(std::move(m52->history_chat_P));
-    std::string chatName = "Открыт чат с пользователем: " + m52->login_name_friend.second;
-    _status->setChatName(std::move(chatName));
-    FriendData friendD;
-    friendD.login = m52->login_name_friend.first;
-    friendD.name = m52->login_name_friend.second;
-    _status->setFriendOpenChatP(std::move(friendD));
-    // флаг что сообщения обновлены
-    _status->setResetMess(true);
+    get_logger() << "HandlerMessage52 | Пришло сообщение Message52 | Игнорирую";
     return true;
 }
 
@@ -87,22 +73,19 @@ bool HandlerMessage53::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    auto m53 = std::dynamic_pointer_cast<Message53>(message);
-    _status->setListChatP(std::move(m53->list_chat_P));
+    get_logger() << "HandlerMessage53 | Пришло сообщение Message53 | Игнорирую";
     return true;
 }
 
 
-// Обработка для Message53 (получить список всех юзеров в чате кому написать)
+// Обработка для Message54 (получить список всех юзеров в чате кому написать)
 bool HandlerMessage54::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
     if (message->getTupe() != 54) {
         // Не наше - передаем следующему в цепочке
         return handleNext(message);
     }
-    //обрабатываем
-    auto m54 = std::dynamic_pointer_cast<Message54>(message);
-    _status->setListUsers(std::move(m54->list_Users));
+    get_logger() << "HandlerMessage54 | Пришло сообщение Message54 | Игнорирую";
     return true;
 }
 
@@ -115,13 +98,12 @@ bool HandlerMessage55::handle(const std::shared_ptr<Message>& message) {
         return handleNext(message);
     }
     //обрабатываем
-    _status->setServerResponseReg(true); // Ответ пришел
-    _status->setLoginBusy(true);
+    get_logger() << "HandlerMessage55 | Пришло сообщение Message53 | Игнорирую";
     return true;
 }
 
 
-// Обработка для Message56 ( Ответ сервера Вы залогинены)
+// Обработка для Message56 (Вы залогинены)
 bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
     if (message->getTupe() != 56) {
@@ -134,15 +116,72 @@ bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
     if (m56->authorization)
     {
         _status->setAuthorizationStatus(true);
-        User us(m56->my_login, "", m56->my_name);
-        _status->setUser(us);
+        get_logger() << "HandlerMessage56 | Выполнен вход";
     }
     else
     {
         _status->setAuthorizationStatus(false);
+        get_logger() << "HandlerMessage56 | Ошибка входа, проверь сервер\n  m56->authorization - false";
+
     } 
     return true;
 }
+
+
+// Обработка для Message57 ответ на discon user
+bool HandlerMessage57::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 57) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    auto m57 = std::dynamic_pointer_cast<Message57>(message);
+
+    return true;
+}
+
+
+// Обработка для Message58  ответ на ban user
+bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 58) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    auto m58 = std::dynamic_pointer_cast<Message58>(message);
+
+    return true;
+}
+
+// Обработка для Message59 ответ на запрос списка юзеров ADMIN
+bool HandlerMessage59::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 59) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    auto m59 = std::dynamic_pointer_cast<Message59>(message);
+
+    return true;
+}
+
+
+//Обработка для Message60 ADMIN ответ на запрос списка сообщений
+bool HandlerMessage60::handle(const std::shared_ptr<Message>& message) {
+    // Проверяем, наше ли это сообщение
+    if (message->getTupe() != 60) {
+        // Не наше - передаем следующему в цепочке
+        return handleNext(message);
+    }
+    //обрабатываем
+    auto m60 = std::dynamic_pointer_cast<Message60>(message);
+
+    return true;
+}
+
 
 // ошибка
 bool HandlerErr::handle(const std::shared_ptr<Message>& message) {

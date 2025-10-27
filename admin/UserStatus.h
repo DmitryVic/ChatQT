@@ -61,6 +61,9 @@ private:
     std::vector<MessageStructAdmin> _messList;
     mutable std::mutex _messListMutex;
 
+    SelectedUser _selectedUser;
+    mutable std::mutex _selectedUserMutex;
+
     // Сообщения обновлены?
     std::atomic<bool> _resetMess {false};
 
@@ -69,8 +72,6 @@ private:
     std::vector<AdminDataUsers> _list_Users;
     mutable std::mutex _list_Users_Mutex;
 
-    SelectedUser _selectedUser;
-    mutable std::mutex _selectedUserMutex;
     
     //#################### Уведомления ####################
     mutable std::mutex notifiMutex;
@@ -83,7 +84,8 @@ private:
     //Авторизация выполненна или нет, от сервера должны получить true + свой логин с именем 
     std::atomic<bool> _authorizationStatus = false;
 
-    
+    //Ответ от сетвера получен
+     std::atomic<bool> _serverResponseReg = false;
     
 public:
     UserStatus();
@@ -129,10 +131,6 @@ public:
 
     //#################### Флаги ####################
 
-    //получить флаг наличия критических ошибок на сервере (true - ошибки) 
-    bool getSrvStatErrFatall() const;
-    //изменить статус флага наличия критических ошибок на сервере (true - ошибки)
-    void setSrvStatErrFatall(bool SrvStatErrFatall);
 
     //#################### СЕТЬ ####################
     
@@ -154,7 +152,7 @@ public:
     std::vector<MessageStructAdmin> getMessList() const;
     void setMessList(std::vector<MessageStructAdmin> &&messList);
 
-    std::string getSelectedUser() const;
+    SelectedUser getSelectedUser() const;
     void setSelectedUser(SelectedUser selectedUser);
 
     // Сообщения обновлены?
@@ -164,9 +162,7 @@ public:
 
     //#################### СПИСКИ ####################
 
-    //pair<us.login, us.name>
     std::vector<AdminDataUsers> getListUsers() const;
-    //pair<us.login, us.name>
     void setListUsers(std::vector<AdminDataUsers> &&listUsers);
 
 
@@ -182,6 +178,11 @@ public:
     bool getAuthorizationStatus() const;
     //изменить статус флага авторизация
     void setAuthorizationStatus(bool authorizationStatus);
+
+    //Ответ от сетвера получен
+    bool getServerResponseReg() const;
+    //Ответ от сетвера получен
+    void setServerResponseReg(bool serverResponse);
 
 };
 
