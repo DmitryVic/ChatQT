@@ -137,7 +137,6 @@ bool HandlerMessage57::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m57 = std::dynamic_pointer_cast<Message57>(message);
-
     return true;
 }
 
@@ -164,7 +163,7 @@ bool HandlerMessage59::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m59 = std::dynamic_pointer_cast<Message59>(message);
-
+    _status->setListUsers(std::move(m59->list_users));
     return true;
 }
 
@@ -178,7 +177,7 @@ bool HandlerMessage60::handle(const std::shared_ptr<Message>& message) {
     }
     //обрабатываем
     auto m60 = std::dynamic_pointer_cast<Message60>(message);
-
+    _status->setMessList(std::move(m60->list_messages));
     return true;
 }
 
