@@ -20,7 +20,7 @@ public:
   int userId() const;
   QString userName() const;
 
-  void connect_s();
+  // void connect_s();
 
 
 public slots:

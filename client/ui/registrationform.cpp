@@ -1,6 +1,7 @@
 #include "registrationform.h"
 #include "./ui_registrationform.h"
 #include <QMessageBox>
+#include <QTimer>
 #include <thread>
 #include <chrono>
 #include "Logger.h"
@@ -85,6 +86,62 @@ void RegistrationForm::on_buttonBox_accepted()
       return;
     }
   }
+
+  //TO DO
+
+  // QTimer *timer = new QTimer(this);
+  // timer->setInterval(100);
+
+  // connect(timer, &QTimer::timeout, this, [this, timer, attempts = 0]() mutable {
+  //     ++attempts;
+
+  //     if (_userStatus->getAuthorizationStatus() &&
+  //         !_userStatus->getLoginBusy() &&
+  //         _userStatus->getServerResponseReg())
+  //     {
+  //         _userStatus->setServerResponseReg(false);
+  //         ui->serwAnswer->setText("✅ Регистрация успешна");
+  //         ui->buttonBox->setEnabled(true);
+  //         timer->stop();
+  //         timer->deleteLater();
+  //         emit accepted();
+  //         return;
+  //     }
+
+  //     if (_userStatus->getLoginBusy() && _userStatus->getServerResponseReg()) {
+  //         ui->serwAnswer->setText("⚠️ Логин занят");
+  //         QMessageBox::critical(this, tr("Error"), tr("Login is busy"));
+  //         _userStatus->setLoginBusy(false);
+  //         _userStatus->setServerResponseReg(false);
+  //         ui->buttonBox->setEnabled(true);
+  //         timer->stop();
+  //         timer->deleteLater();
+  //         return;
+  //     }
+
+  //     if (!_userStatus->getAuthorizationStatus() && _userStatus->getServerResponseReg()) {
+  //         ui->serwAnswer->setText("⚠️ Ошибка данных для регистрации");
+  //         QMessageBox::critical(this, tr("Error"), tr("Data error"));
+  //         _userStatus->setServerResponseReg(false);
+  //         ui->buttonBox->setEnabled(true);
+  //         timer->stop();
+  //         timer->deleteLater();
+  //         return;
+  //     }
+
+  //     if (attempts > 20) {
+  //         ui->serwAnswer->setText("⚠️ Превышено время ожидания ответа от сервера по регистрации");
+  //         QMessageBox::critical(this, tr("Error"), tr("Timeout waiting for server response"));
+  //         ui->buttonBox->setEnabled(true);
+  //         timer->stop();
+  //         timer->deleteLater();
+  //         return;
+  //     }
+  // });
+
+  // timer->start();
+
+
 }
 
 
