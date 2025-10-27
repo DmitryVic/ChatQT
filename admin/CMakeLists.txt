@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Chat_client VERSION 0.1 LANGUAGES CXX)
+project(Admin_client VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -75,9 +75,9 @@ qt5_add_resources(QRC ${RC_FILES})
 #здесь происходит создание файлов переводов и установка зависимостей,
 #чтобы эти файлы генерировались во время билда проекта
 set(TS_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/translations/Chat_client_ru_RU.ts)
+  ${CMAKE_CURRENT_SOURCE_DIR}/admin_translations/Admin_client_ru_RU.ts)
 file(GLOB_RECURSE TS_SOURCES "*.cpp" "*.h" "*.ui")
-add_custom_target(translations)
+add_custom_target(admin_translations)
 #по сути, при билде для каждого .ts файла вызывается
 #утилита lupdate.exe
 foreach(_ts_file ${TS_FILES})
@@ -91,14 +91,14 @@ foreach(_ts_file ${TS_FILES})
     ${CMAKE_CURRENT_SOURCE_DIR} -ts ${_ts_file}
     )
   add_custom_target(translate_${_ts_name} DEPENDS ${_ts_file})
-  add_dependencies(translations translate_${_ts_name})
+  add_dependencies(admin_translations translate_${_ts_name})
 endforeach()
 
 #подключаем файлы трансляции(переводов)
 qt5_add_translation(QM_FILES ${TS_FILES})
 
 # СОЗДАЕМ ИСПОЛНЯЕМЫЙ ФАЙЛ (ОСНОВА ИЗ КОНСОЛЬНОЙ ВЕРСИИ + Qt UI)
-add_executable(Chat_client
+add_executable(Admin_client
     # Главный файл (должен быть в корне)
     main.cpp
     
@@ -116,7 +116,7 @@ add_executable(Chat_client
 )
 
 # Отключаем консоль для всех платформ через свойства Qt
-set_target_properties(Chat_client PROPERTIES
+set_target_properties(Admin_client PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
@@ -124,20 +124,20 @@ set_target_properties(Chat_client PROPERTIES
 # СЕТЕВЫЕ НАСТРОЙКИ ИЗ КОНСОЛЬНОЙ ВЕРСИИ
 # Для Windows-клиента
 if(WIN32)
-    target_link_libraries(Chat_client PRIVATE ws2_32)
+    target_link_libraries(Admin_client PRIVATE ws2_32)
 endif()
 
 # Для Linux-клиента
 if(UNIX AND NOT APPLE)
-    target_compile_definitions(Chat_client PRIVATE SET_GLOBAL_LOCALE_LINUX)
+    target_compile_definitions(Admin_client PRIVATE SET_GLOBAL_LOCALE_LINUX)
 endif()
 
 # линкует клиентский исполняемый файл с общей библиотекой
-target_link_libraries(Chat_client PRIVATE common)
+target_link_libraries(Admin_client PRIVATE common)
 # общая библиотека нужна только для сборки PRIVATE
 
 # ПОДКЛЮЧАЕМ QT БИБЛИОТЕКИ
-target_link_libraries(Chat_client
+target_link_libraries(Admin_client
   PUBLIC
   ${CHAT_LIBRARIES}
   )
@@ -146,7 +146,7 @@ target_link_libraries(Chat_client
 # ДИРЕКТОРИИ ДЛЯ INCLUDE
 # Добавляем директорию с Qt исходниками в include path, чтобы
 # сгенерированные ui_*.h могли найти заголовки типа "loginform.h".
-target_include_directories(Chat_client PRIVATE 
+target_include_directories(Admin_client PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/ui
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}  # Добавляем корень для заголовков в корне

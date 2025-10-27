@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "startscreen.h"
 #include <QStringListModel>
 #include <QStandardItemModel>
 #include <QDebug>
@@ -17,7 +16,8 @@
 #include <QScrollBar>
 #include <thread>
 #include <chrono>
-
+#include "Message.h"
+#include "startscreen.h"
 
 MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
 : QMainWindow(parent), _userStatus(std::move(userStatus)), ui(new Ui::MainWindow)
@@ -26,8 +26,6 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
 
        setStyleDark();
 
-
-       ui->messButtonPush->setText("Отправить 📨");
 
        // Таймер для проверки обновлений из рабочих потоков
        QTimer* timer = new QTimer(this);
@@ -42,39 +40,30 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
 
        /////////////////////////////// Обновления ///////////////////////////////
 
-       // Отправка запроса о получении списка приватных чатов
-       Message5 mess5;
-       mess5.my_login = _userStatus->getUser().getLogin();
-       json j5;
-       mess5.to_json(j5);
-       _userStatus->pushMessageToSend(j5.dump());
+       // запрос на получение спика  юзеров
+       Message12 mess12;
+       json j12;
+       mess12.to_json(j12);
+       _userStatus->pushMessageToSend(j12.dump());
 
-       // Отправка запроса о получении списока всех юзеров в чате кому написать
-       Message6 mess6;
-       mess6.my_login = _userStatus->getUser().getLogin();
-       json j6;
-       mess6.to_json(j6);
-       _userStatus->pushMessageToSend(j6.dump());
+       //  запрос на получение списка сообщений
+       Message13 mess13;
+       json j13;
+       mess13.to_json(j13);
+       _userStatus->pushMessageToSend(j13.dump());
 
        // Таймер для отправки запросов на обновление списков
        QTimer* timer_list = new QTimer(this);
-       timer_list->setInterval(2000); // обновление каждые 2 секунды
+       timer_list->setInterval(3000); // обновление каждые 3 секунды
        connect(timer_list, &QTimer::timeout, this, [this]() {
               if (_userStatus->getNetworckConnect())
               {
-                     // Отправка запроса о получении списка приватных чатов
-                     Message5 mess5;
-                     mess5.my_login = _userStatus->getUser().getLogin();
-                     json j5;
-                     mess5.to_json(j5);
-                     _userStatus->pushMessageToSend(j5.dump());
+                     // запрос на получение спика  юзеров
+                     Message12 mess12;
+                     json j12;
+                     mess12.to_json(j12);
+                     _userStatus->pushMessageToSend(j12.dump());
 
-                     // Отправка запроса о получении списока всех юзеров в чате кому написать
-                     Message6 mess6;
-                     mess6.my_login = _userStatus->getUser().getLogin();
-                     json j6;
-                     mess6.to_json(j6);
-                     _userStatus->pushMessageToSend(j6.dump());
               }
               else{
               // ПРИ ПОТЕРИ СВЯЗИ ПОКА ПРОСТО ЗАКЫВАЕМ, НУЖНО ДОПИСАТЬ ЛОГИКУ ПОВТОРНОГО ЛОГИРОВАНИЯ
@@ -96,6 +85,13 @@ MainWindow::~MainWindow () {
 
 MainWindow *MainWindow::createClient(std::shared_ptr<UserStatus> userStatus)
 {
+       StartScreen s(userStatus, nullptr); //   СОЗДАЕТСЯ StartScreen
+       // s.connect_s();
+       auto result = s.exec();            //   ПОКАЗЫВАЕТСЯ StartScreen (модально)
+       if(result == QDialog::Rejected)
+       {
+              return nullptr;
+       }
        // создается MainWindow после успешного входа (запуск уже в Main)
        auto w = new MainWindow(userStatus);
        // w->setUserStatus(userStatus);
@@ -183,11 +179,10 @@ void MainWindow::resetMessagesArea() {
               scrollLayoutMessages->setContentsMargins(8, 8, 8, 8);
        }
 
-       std::vector<MessageStruct> message = _userStatus->getMessList();
+       std::vector<MessageStructAdmin> message = _userStatus->getMessList();
        
        // Добавляем 
-       for (MessageStruct msg : message) {
-              bool isMyMessage = msg.userLogin == _userStatus->getUser().getLogin();
+       for (MessageStructAdmin msg : message) {
 
               QWidget *messageWidget = new QWidget(scrollContentMessages);
               QHBoxLayout *messageLayout = new QHBoxLayout(messageWidget);
@@ -195,7 +190,7 @@ void MainWindow::resetMessagesArea() {
 
               // Контент сообщения
               QWidget *contentWidget = new QWidget(messageWidget);
-              contentWidget->setObjectName(isMyMessage ? "message-bubble-my" : "message-bubble-other");
+              contentWidget->setObjectName(msg.messFromChatH ? "message-bubble-my" : "message-bubble-other");
 
               // ВАЖНО: разрешаем рисовать фон у этого виджета
               contentWidget->setAttribute(Qt::WA_StyledBackground, true); // эта строка решает проблему с фоном!
@@ -207,7 +202,7 @@ void MainWindow::resetMessagesArea() {
 
               // Текст сообщения
               QLabel *messageText = new QLabel(contentWidget);
-              messageText->setObjectName(isMyMessage ? "message-text-my" : "message-text");
+              messageText->setObjectName(msg.messFromChatH ? "message-text-my" : "message-text");
               messageText->setWordWrap(true);
 
               messageText->setText(QString("%1: %2").arg(QString::fromStdString(msg.userName), QString::fromStdString(msg.mess)));
@@ -217,7 +212,7 @@ void MainWindow::resetMessagesArea() {
 
               // Время
               QLabel *timeLabel = new QLabel(contentWidget);
-              timeLabel->setObjectName(isMyMessage ? "message-time-my" : "message-time");
+              timeLabel->setObjectName(msg.messFromChatH ? "message-time-my" : "message-time");
               timeLabel->setText(QString::fromStdString(timestampToString(msg.time)));
               timeLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
@@ -233,7 +228,7 @@ void MainWindow::resetMessagesArea() {
               contentWidget->setMaximumWidth(400);
 
               // Выравнивание bubble по правому/левому краю
-              if (isMyMessage) {
+              if (msg.messFromChatH) {
               messageLayout->addStretch();
               messageLayout->addWidget(contentWidget);
               } else {
@@ -247,22 +242,6 @@ void MainWindow::resetMessagesArea() {
 
        // Добавляем растягивающийся элемент в конец
        scrollLayoutMessages->addStretch();
-
-       std::string chatName = _userStatus->getChatName();
-
-       // Получаем модель, если есть — очищаем, иначе создаём новую
-       QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->chatName->model());
-       if (!model) {
-              model = new QStandardItemModel(this);
-              ui->chatName->setModel(model);
-       } else {
-              model->clear(); // очищаем старые элементы
-       }
-
-       // Добавляем новый текст (используем переменную chatName, а не повторный вызов)
-       QStandardItem *item = new QStandardItem(QString::fromStdString(chatName));
-       item->setEditable(false); // обычно заголовки не редактируемы
-       model->appendRow(item);
 
 }
 
@@ -283,7 +262,7 @@ void MainWindow::clearChatListArea()
     }
 }
 
-// Полное обновление списка чатов
+// Полное обновление списка клиентов
 void MainWindow::resetChatListArea()
 {
        // Сначала очищаем старые кнопки
@@ -304,77 +283,49 @@ void MainWindow::resetChatListArea()
               scrollLayout->setSpacing(4);
        }
 
-       //ДОБАВЛЯЕМ ОБЩИЙ ЧАТ
-       QPushButton *chatButton = new QPushButton(scrollContent);
-       chatButton->setText(QString::fromStdString("👥 Общий чат"));
-       chatButton->setMinimumHeight(50);
-       chatButton->setMaximumHeight(50);
-       chatButton->setObjectName("chat-button");
-
-       connect(chatButton, &QPushButton::clicked, this, [this]() {
-              // запрос на получение данных общео чата
-              Message9 mess9;
-              mess9.user_sender = _userStatus->getUser().getLogin();
-              json j9;
-              mess9.to_json(j9);
-              _userStatus->pushMessageToSend(j9.dump());
-       });
-
-       scrollLayout->addWidget(chatButton);
-
-       //ДОБАВЛЯЕМ ПРИВАТНЫЙЕ ЧАТЫ
-       std::vector<std::pair<std::string, std::string>> lastChatP = _userStatus->getListChatP(); // Загружаем список чатов из UserStatus pair<us.login, us.name>
-
-       for (const auto& chat : lastChatP) {
-              const std::string& userLogin = chat.first;
-              const std::string& userName = chat.second;
-              const std::string& bottonTitle = "💬 " + userName + " (" + userLogin + ")";
-              QPushButton *chatButton = new QPushButton(scrollContent);
-              chatButton->setText(QString::fromStdString(bottonTitle));
-              chatButton->setMinimumHeight(50);
-              chatButton->setMaximumHeight(50);
-              chatButton->setObjectName("chat-button");
-
-              connect(chatButton, &QPushButton::clicked, this, [userLogin, userName, this]() {
-             // запрос на получение данных приватного чата
-              Message8 mess8;
-              mess8.user_sender = _userStatus->getUser().getLogin();
-              mess8.user_recipient = userLogin;
-              json j8;
-              mess8.to_json(j8);
-              _userStatus->pushMessageToSend(j8.dump());
-              FriendData friendD;
-              friendD.login = userLogin;
-              friendD.name = userName;
-              _userStatus->setFriendOpenChatP(std::move(friendD));
-              });
-              scrollLayout->addWidget(chatButton);
-       }
 
        //ДОБАВЛЯЕМ ПОЛЬЗОВАТЕЛЕЙ
-       std::vector<std::pair<std::string, std::string>> listUsers = _userStatus->getListUsers(); // Загружаем список пользователей из UserStatus pair<us.login, us.name>
+       std::vector<AdminDataUsers> listUsers = _userStatus->getListUsers(); // Загружаем список пользователей из UserStatus pair<us.login, us.name>
        for (const auto& user : listUsers) {
-              const std::string& userLogin = user.first;
-              const std::string& userName = user.second;
-              const std::string& bottonTitle = "👤 " +  userName + " (" + userLogin + ")";
+              
+              std::string banB = (user.banStatus) ? " ‼️БАН " : "";
+              std::string disB = (user.onlineStatus) ? " ❕ " : "";
+              const std::string& bottonTitle = banB + disB +  user.userName + " (" + user.userLogin + ")";
+
               QPushButton *chatButton = new QPushButton(scrollContent);
               chatButton->setText(QString::fromStdString(bottonTitle));
               chatButton->setMinimumHeight(50);
               chatButton->setMaximumHeight(50);
               chatButton->setObjectName("chat-button");
 
-              connect(chatButton, &QPushButton::clicked, this, [userLogin, userName, this]() {
-              // запрос на получение данных приватного чата
-              Message8 mess8;
-              mess8.user_sender = _userStatus->getUser().getLogin();
-              mess8.user_recipient = userLogin;
-              json j8;
-              mess8.to_json(j8);
-              _userStatus->pushMessageToSend(j8.dump());
-              FriendData friendD;
-              friendD.login = userLogin;
-              friendD.name = userName;
-              _userStatus->setFriendOpenChatP(std::move(friendD));
+              connect(chatButton, &QPushButton::clicked, this, [user, this]() {
+              
+              SelectedUser sUser;
+              sUser.userLogin = user.userLogin;
+              sUser.userName = user.userName;
+              sUser.ban = user.banStatus;
+              sUser.disconn = user.onlineStatus;
+              //Добавляем пользователя в выбор действий
+              _userStatus->setSelectedUser(sUser);
+
+              // Получаем модель, если есть — очищаем, иначе создаём новую
+              QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->selectedUser->model());
+              if (!model) {
+                     model = new QStandardItemModel(this);
+                     ui->selectedUser->setModel(model);
+              } else {
+                     model->clear(); // очищаем старые элементы
+              }
+              std::string ban = (sUser.ban) ? " 🔴 " : " 🟢 ";
+              std::string dis = (sUser.disconn) ? " 🟢 " : " ⚪ ";
+              std::string title = "Выбран пользователь " + sUser.userName + " (" + sUser.userLogin + ") " + 
+              "\nСтатус бана " + ban + " отсоединение отправлено: " + dis;
+
+              // Добавляем новый текст (используем переменную chatName, а не повторный вызов)
+              QStandardItem *item = new QStandardItem(QString::fromStdString(title));
+              item->setEditable(false); // обычно заголовки не редактируемы
+              model->appendRow(item);
+
               });
 
               scrollLayout->addWidget(chatButton);
@@ -390,55 +341,17 @@ void MainWindow::resetChatListArea()
 }
 
 
-void MainWindow::on_messButtonPush_clicked()
+
+// TO DO
+// Обновление сообщений тяжелое, пока по кнопке
+// TO DO обмен с сервером bool есть ли обновления
+// Запрос к БД N ID последней записи, если изменился,
+// то послать новую пачку дваннных
+void MainWindow::on_pushButtonResetMess_clicked()
 {
-  switch (_userStatus->getChatOpen()) {
-    case chat::SHARED_CHAT:
-       // запрос на получение данных приватного чата
-              {
-              Message4 mess4;
-              mess4.login_user_sender = _userStatus->getUser().getLogin();
-              mess4.name_user_sender = _userStatus->getUser().getName();
-              mess4.mess = ui->message_panel->toPlainText().toStdString();
-              ui->message_panel->clear();
-              json j4;
-              mess4.to_json(j4);
-              _userStatus->pushMessageToSend(j4.dump());
-              
-              // запрос на получение данных общео чата
-              Message9 mess9;
-              mess9.user_sender = _userStatus->getUser().getLogin();
-              json j9;
-              mess9.to_json(j9);
-              _userStatus->pushMessageToSend(j9.dump());
-       }
-      break;
-    case chat::PRIVATE_CHAT:
-       {
-              Message3 mess3;
-              mess3.user_sender = _userStatus->getUser().getLogin();
-
-              mess3.user_recipient = _userStatus->getFriendOpenChatP().login;
-              mess3.mess = ui->message_panel->toPlainText().toStdString();
-              ui->message_panel->clear();
-              json j3;
-              mess3.to_json(j3);
-              _userStatus->pushMessageToSend(j3.dump());
-              
-
-              // запрос на получение данных приватного чата
-              Message8 mess8;
-              mess8.user_sender = _userStatus->getUser().getLogin();
-              mess8.user_recipient = _userStatus->getFriendOpenChatP().login;
-              json j8;
-              mess8.to_json(j8);
-              _userStatus->pushMessageToSend(j8.dump());
-              
-
-       }
-      break;
-    default:
-      break;
-    }
+        //  запрос на получение списка сообщений
+       Message13 mess13;
+       json j13;
+       mess13.to_json(j13);
+       _userStatus->pushMessageToSend(j13.dump());
 }
-

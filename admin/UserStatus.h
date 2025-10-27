@@ -23,6 +23,8 @@ struct SelectedUser
 {
     std::string userLogin;
     std::string userName;
+    bool ban;
+    bool disconn;
 };
 
 

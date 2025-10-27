@@ -38,7 +38,7 @@ public:
   private slots:
   void on_styleButton_clicked();
 
-  void on_messButtonPush_clicked();
+  void on_pushButtonResetMess_clicked();
 
   private:
   std::shared_ptr<UserStatus> _userStatus;

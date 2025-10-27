@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
     try {
       std::locale::global(std::locale("ru_RU.UTF-8"));
     } catch (const std::exception& e) {
-      get_logger() << "Locale error: " << e.what() << std::endl;
+      get_logger() << "Locale error: " << e.what();
       std::locale::global(std::locale("C.UTF-8")); // Fallback
     }
     #endif
@@ -179,7 +179,7 @@ int main (int argc, char *argv[])
   const QStringList uiLanguages = QLocale::system ().uiLanguages ();
   for (const QString &locale : uiLanguages)
     {
-      const QString baseName = "Chat_client_" + QLocale (locale).name ();
+      const QString baseName = "Admin_client_" + QLocale (locale).name ();
       if (translator.load (":/i18n/" + baseName))
         {
           a.installTranslator (&translator);

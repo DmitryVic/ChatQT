@@ -143,7 +143,7 @@ bool HandlerMessage57::handle(const std::shared_ptr<Message>& message) {
 
 
 // Обработка для Message58  ответ на ban user
-bool HandlerMessage56::handle(const std::shared_ptr<Message>& message) {
+bool HandlerMessage58::handle(const std::shared_ptr<Message>& message) {
     // Проверяем, наше ли это сообщение
     if (message->getTupe() != 58) {
         // Не наше - передаем следующему в цепочке

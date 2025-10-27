@@ -94,7 +94,7 @@
        <number>10</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="LAYOUT_CHAT" stretch="0,10">
+       <layout class="QVBoxLayout" name="LAYOUT_CHAT" stretch="0,0,10">
         <item>
          <widget class="QLabel" name="notifi">
           <property name="font">
@@ -105,8 +105,12 @@
           <property name="text">
            <string/>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonResetMess">
+          <property name="text">
+           <string>Обновить поле сообщений</string>
           </property>
          </widget>
         </item>
@@ -121,7 +125,7 @@
              <x>0</x>
              <y>0</y>
              <width>682</width>
-             <height>467</height>
+             <height>417</height>
             </rect>
            </property>
           </widget>
