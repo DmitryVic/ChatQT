@@ -178,6 +178,7 @@ bool HandlerMessage60::handle(const std::shared_ptr<Message>& message) {
     //обрабатываем
     auto m60 = std::dynamic_pointer_cast<Message60>(message);
     _status->setMessList(std::move(m60->list_messages));
+    _status->setResetMess(true);
     return true;
 }
 
