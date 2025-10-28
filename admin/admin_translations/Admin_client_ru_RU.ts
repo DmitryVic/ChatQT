@@ -14,17 +14,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/mainwindow.ui" line="113"/>
-        <source>Обновить поле сообщений</source>
+        <location filename="../ui/mainwindow.ui" line="134"/>
+        <source>Прокрутка вниз</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/mainwindow.ui" line="163"/>
+        <location filename="../ui/mainwindow.ui" line="141"/>
         <source>БАН</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/mainwindow.ui" line="170"/>
+        <location filename="../ui/mainwindow.ui" line="148"/>
         <source>Разлогинить</source>
         <translation type="unfinished"></translation>
     </message>

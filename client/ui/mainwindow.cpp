@@ -390,9 +390,6 @@ void MainWindow::resetChatListArea()
        // Добавляем растягивающий элемент, чтобы кнопки прижимались вверх
        scrollLayout->addStretch();
 
-       // скроллим вниз область сообщений
-       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
-       vScrollBar->setValue(vScrollBar->maximum());
        
 }
 
@@ -449,3 +446,14 @@ void MainWindow::on_messButtonPush_clicked()
     }
 }
 
+// TO DO переименовать 
+// Обновление сообщений тяжелое, пока по кнопке
+// TO DO обмен с сервером bool есть ли обновления
+// Запрос к БД N ID последней записи, если изменился,
+// то послать новую пачку дваннных
+void MainWindow::on_pushButtonDMess_clicked()
+{
+       // скроллим вниз область сообщений
+       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
+       vScrollBar->setValue(vScrollBar->maximum());
+}

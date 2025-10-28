@@ -132,7 +132,7 @@ sudo apt install qt6-base-dev qt6-tools-dev qt6-multimedia-dev cmake
 - При установке выбрать Qt 6.x.x MinGW 64-bit
 - После установки убедитесь, что путь к qmake.exe добавлен в PATH
 
-**Способ 2: Установка QT для MinGW **
+**Способ 2: Установка QT для MinGW**
 Запустите терминал MSYS2 MinGW64:
 ```bash
 pacman -Syu
@@ -146,31 +146,57 @@ pacman -S mingw-w64-x86_64-qt6-base mingw-w64-x86_64-qt6-tools mingw-w64-x86_64-
 
 # Сборка и компиляция проекта CMake
 
-## Сборка Linux (сервер + клиент)
+## Сборка Linux (сервер + клиент + админ)
+
+**Корневой CMakeLists.txt подключает подпроекты:**
+- Сервер: chat_server (Linux-only)
+- Клиент: Chat_client (Qt GUI)
+- Админ-панель: Admin_client (Qt GUI)
+- Общая статическая библиотека: common
+
+Полная сборка (Linux): сервер + клиент + админ:
+```bash
+mkdir buildcd
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --parallel
+```
+
+## Сборка только серверной части:
 ```bash
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j$(nproc)
+cmake --build . --target chat_server --parallel
+
 ```
 
-## Сборка только серверной части:
+## Сборка только пользовательского клиента:
 ```bash
 mkdir build
 cd build
-make chat_server -j$(nproc)
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --target Chat_client --parallel
 ```
 
-## Сборка только серверной части:
+## Сборка только админ-клиента:
 ```bash
+mkdir build
 cd build
-make chat_client -j$(nproc)
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --target Admin_client --parallel
 ```
 
 ## Очистка:
+Linux:
 ```bash
-make clean
+rm -rf build
 ```
+Windows:
+```bash
+rmdir /s /q build
+```
+
 
 ## Запуск:
 ```bash
@@ -179,4 +205,7 @@ make clean
 
 # Клиент
 ./build/client/chat_client
+
+# Клиент
+./build/admin/Admin_client
 ```

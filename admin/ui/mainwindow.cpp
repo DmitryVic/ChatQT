@@ -65,6 +65,11 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
                      mess12.to_json(j12);
                      _userStatus->pushMessageToSend(j12.dump());
 
+                     //  запрос на получение списка сообщений
+                     Message13 mess13;
+                     json j13;
+                     mess13.to_json(j13);
+                     _userStatus->pushMessageToSend(j13.dump());
               }
               else{
               // ПРИ ПОТЕРИ СВЯЗИ ПОКА ПРОСТО ЗАКЫВАЕМ, НУЖНО ДОПИСАТЬ ЛОГИКУ ПОВТОРНОГО ЛОГИРОВАНИЯ
@@ -344,18 +349,16 @@ void MainWindow::resetChatListArea()
 
 
 
-// TO DO
+// TO DO переименовать 
 // Обновление сообщений тяжелое, пока по кнопке
 // TO DO обмен с сервером bool есть ли обновления
 // Запрос к БД N ID последней записи, если изменился,
 // то послать новую пачку дваннных
-void MainWindow::on_pushButtonResetMess_clicked()
+void MainWindow::on_pushButtonDMess_clicked()
 {
-        //  запрос на получение списка сообщений
-       Message13 mess13;
-       json j13;
-       mess13.to_json(j13);
-       _userStatus->pushMessageToSend(j13.dump());
+       // скроллим вниз область сообщений
+       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
+       vScrollBar->setValue(vScrollBar->maximum());
 }
 
 void MainWindow::on_pushButton_BAN_clicked()

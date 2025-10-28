@@ -105,9 +105,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
-          </property>
          </widget>
         </item>
         <item>
@@ -143,7 +140,7 @@
              <x>0</x>
              <y>0</y>
              <width>682</width>
-             <height>405</height>
+             <height>380</height>
             </rect>
            </property>
           </widget>
@@ -166,55 +163,80 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="messButtonPush">
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>27</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <bold>true</bold>
-            <kerning>false</kerning>
-           </font>
-          </property>
-          <property name="mouseTracking">
-           <bool>false</bool>
-          </property>
-          <property name="tabletTracking">
-           <bool>false</bool>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::InputMethodHint::ImhNone</set>
-          </property>
-          <property name="text">
-           <string>Отправить</string>
-          </property>
-          <property name="icon">
-           <iconset theme="QIcon::ThemeIcon::DocumentSend"/>
-          </property>
-          <property name="checkable">
-           <bool>false</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <property name="autoRepeat">
-           <bool>false</bool>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QPushButton" name="pushButtonDMess">
+            <property name="font">
+             <font>
+              <family>Serif</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>CrossCursor</cursorShape>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Прокрутка вниз</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="messButtonPush">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>false</kerning>
+             </font>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>false</bool>
+            </property>
+            <property name="inputMethodHints">
+             <set>Qt::ImhNone</set>
+            </property>
+            <property name="text">
+             <string>Отправить</string>
+            </property>
+            <property name="icon">
+             <iconset theme="QIcon::ThemeIcon::DocumentSend">
+              <normaloff>.</normaloff>.</iconset>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
+            <property name="default">
+             <bool>true</bool>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>

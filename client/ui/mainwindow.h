@@ -37,7 +37,7 @@ public:
   
   private slots:
   void on_styleButton_clicked();
-
+  void on_pushButtonDMess_clicked();
   void on_messButtonPush_clicked();
 
   private:

@@ -65,7 +65,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/mainwindow.ui" line="194"/>
+        <location filename="../ui/mainwindow.ui" line="182"/>
+        <source>Прокрутка вниз</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/mainwindow.ui" line="213"/>
         <source>Отправить</source>
         <translation type="unfinished"></translation>
     </message>
