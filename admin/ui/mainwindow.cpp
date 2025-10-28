@@ -18,6 +18,7 @@
 #include <chrono>
 #include "Message.h"
 #include "startscreen.h"
+#include "Logger.h"
 
 MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
 : QMainWindow(parent), _userStatus(std::move(userStatus)), ui(new Ui::MainWindow)
@@ -127,6 +128,7 @@ void MainWindow::resetMainWind(){
        {
               resetMessagesArea();
               _userStatus->setResetMess(false); // сброс флага после обновления
+              // get_logger() << "_userStatus->setResetMess(false); // сброс флага после обновления";
        }
 }
 
@@ -204,8 +206,8 @@ void MainWindow::resetMessagesArea() {
               QLabel *messageText = new QLabel(contentWidget);
               messageText->setObjectName(msg.messFromChatH ? "message-text-my" : "message-text");
               messageText->setWordWrap(true);
-
-              messageText->setText(QString("%1: %2").arg(QString::fromStdString(msg.userName), QString::fromStdString(msg.mess)));
+              QString typeMess = (msg.messFromChatH) ? "Общий чат:\n" : "Приват\n";
+              messageText->setText(QString("%1 %2 :\n %3").arg(typeMess, QString::fromStdString(msg.userName), QString::fromStdString(msg.mess)));
 
               messageText->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
               messageText->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -289,7 +291,7 @@ void MainWindow::resetChatListArea()
        for (const auto& user : listUsers) {
               
               std::string banB = (user.banStatus) ? " ‼️БАН " : "";
-              std::string disB = (user.onlineStatus) ? " ❕ " : "";
+              std::string disB = (user.onlineStatus) ? "" : " ❕ ";
               const std::string& bottonTitle = banB + disB +  user.userName + " (" + user.userLogin + ")";
 
               QPushButton *chatButton = new QPushButton(scrollContent);
@@ -334,9 +336,9 @@ void MainWindow::resetChatListArea()
        // Добавляем растягивающий элемент, чтобы кнопки прижимались вверх
        scrollLayout->addStretch();
 
-       // скроллим вниз область сообщений
-       QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
-       vScrollBar->setValue(vScrollBar->maximum());
+       // // скроллим вниз область сообщений
+       // QScrollBar *vScrollBar = ui->scrollAreaMessage->verticalScrollBar();
+       // vScrollBar->setValue(vScrollBar->maximum());
        
 }
 
@@ -355,3 +357,50 @@ void MainWindow::on_pushButtonResetMess_clicked()
        mess13.to_json(j13);
        _userStatus->pushMessageToSend(j13.dump());
 }
+
+void MainWindow::on_pushButton_BAN_clicked()
+{
+       Message11 m11;
+       SelectedUser user = _userStatus->getSelectedUser();
+       m11.user_login = user.userLogin;
+       if (user.userLogin != ""){
+              if (user.ban)
+                     m11.ban_value = false;
+              else
+                     m11.ban_value = true;
+              
+              json j11;
+              m11.to_json(j11);
+              _userStatus->pushMessageToSend(j11.dump());
+       }
+        // Получаем модель, если есть — очищаем, иначе создаём новую
+       QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->selectedUser->model());
+       if (!model) {
+              model = new QStandardItemModel(this);
+              ui->selectedUser->setModel(model);
+       } else {
+              model->clear(); // очищаем старые элементы
+       }
+}
+
+
+void MainWindow::on_pushButton_DISCONNECT_clicked()
+{
+       Message10 m10;
+       SelectedUser user = _userStatus->getSelectedUser();
+       m10.user_login = user.userLogin;
+       if (user.userLogin != ""){
+              json j10;
+              m10.to_json(j10);
+              _userStatus->pushMessageToSend(j10.dump());
+       }
+        // Получаем модель, если есть — очищаем, иначе создаём новую
+       QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->selectedUser->model());
+       if (!model) {
+              model = new QStandardItemModel(this);
+              ui->selectedUser->setModel(model);
+       } else {
+              model->clear(); // очищаем старые элементы
+       }
+}
+

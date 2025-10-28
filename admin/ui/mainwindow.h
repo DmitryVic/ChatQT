@@ -40,6 +40,10 @@ public:
 
   void on_pushButtonResetMess_clicked();
 
+  void on_pushButton_BAN_clicked();
+
+  void on_pushButton_DISCONNECT_clicked();
+
   private:
   std::shared_ptr<UserStatus> _userStatus;
   Ui::MainWindow *ui;
