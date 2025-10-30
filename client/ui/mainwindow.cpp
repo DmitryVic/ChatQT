@@ -83,6 +83,27 @@ MainWindow::MainWindow (std::shared_ptr<UserStatus> userStatus, QWidget *parent)
                      this->close(); // Закрываем окно
               }
 
+              if (_userStatus->getChatOpen() == chat::PRIVATE_CHAT)
+              {
+
+                     // запрос на получение данных приватного чата
+                     Message8 mess8;
+                     mess8.user_sender = _userStatus->getUser().getLogin();
+                     FriendData friendD = _userStatus->getFriendOpenChatP();
+                     mess8.user_recipient = friendD.login;
+                     json j8;
+                     mess8.to_json(j8);
+                     _userStatus->pushMessageToSend(j8.dump());
+              }
+              else{
+                     // запрос на получение данных общео чата
+                     Message9 mess9;
+                     mess9.user_sender = _userStatus->getUser().getLogin();
+                     json j9;
+                     mess9.to_json(j9);
+                     _userStatus->pushMessageToSend(j9.dump());
+              }
+
        });
        timer_list->start();
 }
