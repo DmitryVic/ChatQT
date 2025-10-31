@@ -2,15 +2,71 @@
 #include "./ui_registrationform.h"
 #include <QMessageBox>
 #include <QTimer>
-#include <thread>
-#include <chrono>
 #include "Logger.h"
 
 
 RegistrationForm::RegistrationForm(QWidget *parent, std::shared_ptr<UserStatus> userStatus) :
-  QWidget(parent), _userStatus(userStatus), ui(new Ui::RegistrationForm)
+  QWidget(parent), _userStatus(userStatus), ui(new Ui::RegistrationForm),
+  _regTimer(new QTimer(this))
 {
   ui->setupUi(this);
+  _regTimer->setInterval(100); // 100мс между попытками = 20 попыток за 2 секунды
+  
+  connect(_regTimer, &QTimer::timeout, this, [this]() {
+    _regAttempts++;
+    if (_regAttempts > 20) // таймаут 20 попыток (~2 секунды)
+    {
+      _regTimer->stop();
+      setControlsEnabled(true);
+      ui->serwAnswer->setText("⚠️ Превышено время ожидания ответа от сервера по регистрации");
+      QMessageBox::critical(this,
+                            tr("Error"),
+                            tr("Timeout waiting for server response"));
+      return;
+    }
+    if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
+    {
+      _regTimer->stop();
+      setControlsEnabled(true);
+      ui->serwAnswer->setText("✅ Регистрация успешна");
+      get_logger() << "✅ Регистрация успешна";
+      _userStatus->setServerResponseReg(false);
+      emit accepted();
+      return;
+    }
+    else if(_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
+    {
+      _regTimer->stop();
+      setControlsEnabled(true);
+      ui->serwAnswer->setText("⚠️ Логин занят");
+      QMessageBox::critical(this,
+                            tr("Error"),
+                            tr("Login is busy"));
+      _userStatus->setLoginBusy(false);
+      _userStatus->setServerResponseReg(false);
+      return;
+    }
+    else if(!_userStatus->getAuthorizationStatus() && _userStatus->getServerResponseReg()){ //Ошибочные данные, регистрация не прошла
+      _regTimer->stop();
+      setControlsEnabled(true);
+      ui->serwAnswer->setText("⚠️ Ошибка данных для регистрации");
+      QMessageBox::critical(this,
+                            tr("Error"),
+                            tr("Data error"));
+      _userStatus->setServerResponseReg(false);
+      return;
+    }
+  }, Qt::UniqueConnection);
+}
+
+void RegistrationForm::setControlsEnabled(bool enabled)
+{
+  ui->buttonBox->setEnabled(enabled);
+  ui->loginEdit->setEnabled(enabled);
+  ui->passwordEdit->setEnabled(enabled);
+  ui->passwordConfirmEdit->setEnabled(enabled);
+  ui->nameEdit->setEnabled(enabled);
+  ui->loginButton->setEnabled(enabled);
 }
 
 RegistrationForm::~RegistrationForm()
@@ -46,101 +102,10 @@ void RegistrationForm::on_buttonBox_accepted()
 
   ui->serwAnswer->setText("🕐 Ожидаем ответ сервера ... (2 сек)");
   
-  int attempts = 0;
-  while (true)
-  {
-    attempts++;
-    if (attempts > 20) // таймаут 20 попыток (~2 секунды)
-    {
-      ui->serwAnswer->setText("⚠️ Превышено время ожидания ответа от сервера по регистрации ");
-      QMessageBox::critical(this,
-                            tr("Error"),
-                            tr("Timeout waiting for server response"));
-      return;
-    }
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    if(_userStatus->getAuthorizationStatus() && !_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
-    {
-      get_logger() << "✅ Регистрация успешна";
-      _userStatus->setServerResponseReg(false); // сбрасываем флаг
-      emit accepted(); // уведомляем о успешной регистрации
-      return;
-    }
-    else if(_userStatus->getLoginBusy() && _userStatus->getServerResponseReg())
-    {
-      ui->serwAnswer->setText("⚠️ Логин занят");
-      QMessageBox::critical(this,
-                            tr("Error"),
-                            tr("Login is busy"));
-      _userStatus->setLoginBusy(false); // Сбрасываем флаг
-      _userStatus->setServerResponseReg(false); // сбрасываем флаг
-      return;
-    }
-    else if(!_userStatus->getAuthorizationStatus() && _userStatus->getServerResponseReg()){ //Ошибочные данные, регистрация не прошла
-      ui->serwAnswer->setText("⚠️ Ошибка данных для регистрации");
-      QMessageBox::critical(this,
-                            tr("Error"),
-                            tr("Data error"));
-      _userStatus->setServerResponseReg(false); // сбрасываем флаг
-      return;
-    }
-  }
-
-  //TO DO
-
-  // QTimer *timer = new QTimer(this);
-  // timer->setInterval(100);
-
-  // connect(timer, &QTimer::timeout, this, [this, timer, attempts = 0]() mutable {
-  //     ++attempts;
-
-  //     if (_userStatus->getAuthorizationStatus() &&
-  //         !_userStatus->getLoginBusy() &&
-  //         _userStatus->getServerResponseReg())
-  //     {
-  //         _userStatus->setServerResponseReg(false);
-  //         ui->serwAnswer->setText("✅ Регистрация успешна");
-  //         ui->buttonBox->setEnabled(true);
-  //         timer->stop();
-  //         timer->deleteLater();
-  //         emit accepted();
-  //         return;
-  //     }
-
-  //     if (_userStatus->getLoginBusy() && _userStatus->getServerResponseReg()) {
-  //         ui->serwAnswer->setText("⚠️ Логин занят");
-  //         QMessageBox::critical(this, tr("Error"), tr("Login is busy"));
-  //         _userStatus->setLoginBusy(false);
-  //         _userStatus->setServerResponseReg(false);
-  //         ui->buttonBox->setEnabled(true);
-  //         timer->stop();
-  //         timer->deleteLater();
-  //         return;
-  //     }
-
-  //     if (!_userStatus->getAuthorizationStatus() && _userStatus->getServerResponseReg()) {
-  //         ui->serwAnswer->setText("⚠️ Ошибка данных для регистрации");
-  //         QMessageBox::critical(this, tr("Error"), tr("Data error"));
-  //         _userStatus->setServerResponseReg(false);
-  //         ui->buttonBox->setEnabled(true);
-  //         timer->stop();
-  //         timer->deleteLater();
-  //         return;
-  //     }
-
-  //     if (attempts > 20) {
-  //         ui->serwAnswer->setText("⚠️ Превышено время ожидания ответа от сервера по регистрации");
-  //         QMessageBox::critical(this, tr("Error"), tr("Timeout waiting for server response"));
-  //         ui->buttonBox->setEnabled(true);
-  //         timer->stop();
-  //         timer->deleteLater();
-  //         return;
-  //     }
-  // });
-
-  // timer->start();
-
+  _regAttempts = 0;
+  if (_regTimer->isActive()) _regTimer->stop();
+  setControlsEnabled(false);
+  _regTimer->start();
 
 }
 
@@ -148,6 +113,8 @@ void RegistrationForm::on_buttonBox_accepted()
 
 void RegistrationForm::on_buttonBox_rejected()
 {
+  if (_regTimer && _regTimer->isActive()) _regTimer->stop();
+  setControlsEnabled(true);
   emit rejected();
 }
 

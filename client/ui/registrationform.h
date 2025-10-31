@@ -5,6 +5,8 @@
 #include <memory>
 #include <UserStatus.h>
 
+class QTimer;
+
 namespace Ui {
 class RegistrationForm;
 }
@@ -30,8 +32,11 @@ private slots:
   void on_buttonBox_rejected();
 
 private:
+  void setControlsEnabled(bool enabled);
   std::shared_ptr<class UserStatus> _userStatus;
   Ui::RegistrationForm *ui;
+  QTimer* _regTimer = nullptr;
+  int _regAttempts = 0;
 };
 
 #endif // REGISTRATIONFORM_H

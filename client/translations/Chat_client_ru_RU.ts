@@ -24,31 +24,31 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="28"/>
-        <location filename="../ui/loginform.cpp" line="65"/>
+        <location filename="../ui/loginform.cpp" line="24"/>
+        <location filename="../ui/loginform.cpp" line="44"/>
+        <location filename="../ui/loginform.cpp" line="56"/>
         <location filename="../ui/loginform.cpp" line="84"/>
-        <location filename="../ui/loginform.cpp" line="94"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="29"/>
-        <source>Password is wrong</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/loginform.cpp" line="66"/>
-        <source>Timeout waiting for server response</source>
+        <location filename="../ui/loginform.cpp" line="57"/>
+        <source>Invalid login or password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/loginform.cpp" line="85"/>
-        <source>Login is busy</source>
+        <source>Password is wrong</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/loginform.cpp" line="95"/>
-        <source>Error login or pass</source>
+        <location filename="../ui/loginform.cpp" line="25"/>
+        <source>Timeout waiting for server response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/loginform.cpp" line="45"/>
+        <source>Login is busy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -108,30 +108,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="34"/>
-        <location filename="../ui/registrationform.cpp" line="57"/>
-        <location filename="../ui/registrationform.cpp" line="74"/>
-        <location filename="../ui/registrationform.cpp" line="83"/>
+        <location filename="../ui/registrationform.cpp" line="23"/>
+        <location filename="../ui/registrationform.cpp" line="43"/>
+        <location filename="../ui/registrationform.cpp" line="54"/>
+        <location filename="../ui/registrationform.cpp" line="90"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="35"/>
+        <location filename="../ui/registrationform.cpp" line="91"/>
         <source>Passwords not match</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="58"/>
+        <location filename="../ui/registrationform.cpp" line="24"/>
         <source>Timeout waiting for server response</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="75"/>
+        <location filename="../ui/registrationform.cpp" line="44"/>
         <source>Login is busy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/registrationform.cpp" line="84"/>
+        <location filename="../ui/registrationform.cpp" line="55"/>
         <source>Data error</source>
         <translation type="unfinished"></translation>
     </message>

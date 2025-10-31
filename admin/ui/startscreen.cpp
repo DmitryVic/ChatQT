@@ -24,7 +24,6 @@ StartScreen::StartScreen(std::shared_ptr<UserStatus> userStatus, QWidget *parent
   }
   });
   timer->start();
-  // connect_s();
   
   ui->labelInfo->setText("🕐 Ожидаем ответ сервера...");
 
@@ -33,7 +32,7 @@ StartScreen::StartScreen(std::shared_ptr<UserStatus> userStatus, QWidget *parent
   mess1.login = userStatus->getUser().getLogin();
   mess1.pass = userStatus->getUser().getPass();
   json j1;
-  userStatus->pushMessageToSend(j1.dump());
+
 
   try {
     mess1.to_json(j1);
@@ -63,6 +62,7 @@ StartScreen::StartScreen(std::shared_ptr<UserStatus> userStatus, QWidget *parent
     get_logger() << "timerConnect userStatus->getAuthorizationStatus() " << _userStatus->getAuthorizationStatus();
     if(_userStatus->getAuthorizationStatus())
     {
+      timerConnect->stop(); 
       ui->labelInfo->setText("✅ Авторизация успешна");
       get_logger() << "_userStatus->getAuthorizationStatus(): " << _userStatus->getAuthorizationStatus();
       _userStatus->setServerResponseReg(false); // сбрасываем флаг
@@ -72,6 +72,7 @@ StartScreen::StartScreen(std::shared_ptr<UserStatus> userStatus, QWidget *parent
     }
     else if(_userStatus->getServerResponseReg()) // пришел ответ с false
     {
+      timerConnect->stop(); 
       ui->labelInfo->setText("⚠️ Не верный логин или пароль");
       _userStatus->setServerResponseReg(false); // сбрасываем флаг
       reject();
